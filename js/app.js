@@ -12,6 +12,10 @@ let map = null;
 let mapInitialized = false;
 const TORRES_DEL_PAINE = [-51.0000, -73.2300];
 
+// Chart variables
+let windChart = null;
+let tempChart = null;
+
 /**
  * Initialize app on DOM ready
  */
@@ -23,8 +27,7 @@ document.addEventListener('DOMContentLoaded', function () {
         updateUI(e.detail.timestamp);
     });
 
-    // Initial render (will use cache or wait for API)
-    // If data is already there (sync cache), render immediately
+    // Initial render
     if (weatherService.getLastUpdate()) {
         updateUI(weatherService.getLastUpdate());
     }
@@ -40,9 +43,16 @@ function updateUI(timestamp) {
     updateTorresWidget();
     updateLastUpdatedInfo(timestamp);
 
-    // Update map if it's already initialized
+    // Update map if initialized
     if (mapInitialized && map) {
         updateMapMarkers();
+    }
+
+    // Update charts if stats view is active
+    const statsSection = document.getElementById('stats');
+    if (statsSection.style.display === 'block') {
+        renderCharts();
+        renderAlerts();
     }
 }
 
@@ -53,7 +63,7 @@ function renderWeatherCards() {
     const gridContainer = document.querySelector('.row.g-4');
     if (!gridContainer) return;
 
-    gridContainer.innerHTML = ''; // Clear static content
+    gridContainer.innerHTML = '';
 
     const cities = weatherService.getAllCities();
 
@@ -120,7 +130,6 @@ function updateLastUpdatedInfo(date) {
  * Setup navigation events
  */
 function setupNavigation() {
-    // Add smooth scroll to all nav links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
             const href = this.getAttribute('href');
@@ -139,11 +148,14 @@ function setupNavigation() {
  * Scroll to map section
  */
 function scrollToMap() {
-    document.getElementById('mapa').scrollIntoView({ behavior: 'smooth' });
-    const container = document.getElementById('mapContainer');
-    if (!container.classList.contains('show')) {
-        toggleMap();
-    }
+    goHome(); // Ensure we are on home view
+    setTimeout(() => {
+        document.getElementById('mapa').scrollIntoView({ behavior: 'smooth' });
+        const container = document.getElementById('mapContainer');
+        if (!container.classList.contains('show')) {
+            toggleMap();
+        }
+    }, 100);
 }
 
 /**
@@ -179,7 +191,6 @@ function initializeMap() {
 
     updateMapMarkers();
 
-    // Fix map display issues
     setTimeout(() => {
         map.invalidateSize();
     }, 100);
@@ -189,14 +200,12 @@ function initializeMap() {
  * Update Map Markers with current data
  */
 function updateMapMarkers() {
-    // Clear existing markers (optional, but good practice if updating)
     map.eachLayer((layer) => {
         if (layer instanceof L.CircleMarker) {
             map.removeLayer(layer);
         }
     });
 
-    // Add Torres del Paine marker
     L.circleMarker(TORRES_DEL_PAINE, {
         radius: 12,
         fillColor: '#00bcd4',
@@ -205,7 +214,6 @@ function updateMapMarkers() {
         fillOpacity: 0.8
     }).addTo(map).bindPopup('🏔️ Torres del Paine (Glaciar Grey)');
 
-    // Add markers for all cities
     const cities = weatherService.getAllCities();
     cities.forEach(cityName => {
         const data = weatherService.getWeatherData(cityName);
@@ -214,7 +222,6 @@ function updateMapMarkers() {
             const lon = data.city.lon;
             const temp = Math.round(data.current.temperature_2m);
 
-            // Color based on temperature
             let color;
             if (temp < 5) color = '#0d47a1';
             else if (temp < 10) color = '#1976d2';
@@ -239,7 +246,135 @@ function updateMapMarkers() {
 function goHome() {
     document.getElementById('home').style.display = 'block';
     document.getElementById('detail').style.display = 'none';
+    document.getElementById('stats').style.display = 'none';
+
+    // Update active nav link
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    document.querySelector('a[onclick="goHome()"]').classList.add('active');
+
     window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/**
+ * Show Statistics View
+ */
+function showStats() {
+    document.getElementById('home').style.display = 'none';
+    document.getElementById('detail').style.display = 'none';
+    document.getElementById('stats').style.display = 'block';
+
+    // Update active nav link
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    document.querySelector('a[onclick="showStats()"]').classList.add('active');
+
+    renderCharts();
+    renderAlerts();
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/**
+ * Render Charts using Chart.js
+ */
+function renderCharts() {
+    const cities = weatherService.getAllCities();
+    const labels = cities.map(c => c.replace('Torres del Paine - ', '')); // Shorten names
+
+    const windData = [];
+    const tempData = [];
+
+    cities.forEach(city => {
+        const data = weatherService.getWeatherData(city);
+        if (data) {
+            windData.push(data.current.wind_speed_10m);
+            tempData.push(data.current.temperature_2m);
+        }
+    });
+
+    // Wind Chart
+    const windCtx = document.getElementById('windChart').getContext('2d');
+    if (windChart) windChart.destroy();
+
+    windChart = new Chart(windCtx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Viento (km/h)',
+                data: windData,
+                backgroundColor: 'rgba(0, 188, 212, 0.6)',
+                borderColor: 'rgba(0, 188, 212, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+
+    // Temp Chart
+    const tempCtx = document.getElementById('tempChart').getContext('2d');
+    if (tempChart) tempChart.destroy();
+
+    tempChart = new Chart(tempCtx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Temperatura (°C)',
+                data: tempData,
+                backgroundColor: 'rgba(255, 152, 0, 0.2)',
+                borderColor: 'rgba(255, 152, 0, 1)',
+                borderWidth: 2,
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true
+        }
+    });
+}
+
+/**
+ * Render Active Alerts
+ */
+function renderAlerts() {
+    const alerts = weatherService.getAlerts();
+    const container = document.getElementById('alertsContainer');
+
+    if (alerts.length === 0) {
+        container.innerHTML = `
+            <div class="alert alert-success text-center">
+                <i class="fas fa-check-circle"></i> No hay alertas meteorológicas activas en la región.
+            </div>
+        `;
+        return;
+    }
+
+    let html = '<h4 class="mb-3">⚠️ Alertas Activas</h4><div class="list-group">';
+
+    alerts.forEach(alert => {
+        let colorClass = 'list-group-item-warning';
+        if (alert.level === 'danger') colorClass = 'list-group-item-danger';
+        if (alert.level === 'info') colorClass = 'list-group-item-info';
+
+        html += `
+            <div class="list-group-item ${colorClass} d-flex justify-content-between align-items-center">
+                <div>
+                    <i class="fas ${alert.icon} mr-2"></i>
+                    <strong>${alert.city}:</strong> ${alert.message}
+                </div>
+                <span class="badge badge-dark">ACTIVO</span>
+            </div>
+        `;
+    });
+
+    html += '</div>';
+    container.innerHTML = html;
 }
 
 /**
@@ -247,16 +382,12 @@ function goHome() {
  */
 function showDetail(city) {
     const data = weatherService.getWeatherData(city);
-    if (!data) {
-        console.error('No data found for city:', city);
-        return;
-    }
+    if (!data) return;
 
     const current = data.current;
     const daily = data.daily;
     const desc = weatherService.getWeatherDescription(current.weather_code);
 
-    // Build detail HTML
     let html = `
         <div class="detail-header">
             <h2><i class="fas fa-location-dot"></i> ${city}</h2>
@@ -283,12 +414,11 @@ function showDetail(city) {
         
         <div class="forecast-section">
             <h3 class="forecast-title">
-                <i class="fas fa-calendar-week"></i> Pronóstico Semanal (Click para detalles)
+                <i class="fas fa-calendar-week"></i> Pronóstico Semanal
             </h3>
             <div class="row g-3">
     `;
 
-    // Add forecast cards
     for (let i = 0; i < daily.time.length; i++) {
         const date = new Date(daily.time[i]);
         const dateStr = date.toLocaleDateString('es-CL', {
@@ -331,9 +461,9 @@ function showDetail(city) {
         <div id="dayDetail"></div>
     `;
 
-    // Update DOM
     document.getElementById('detailContent').innerHTML = html;
     document.getElementById('home').style.display = 'none';
+    document.getElementById('stats').style.display = 'none';
     document.getElementById('detail').style.display = 'block';
 
     window.scrollTo({ top: 0, behavior: 'smooth' });

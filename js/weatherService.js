@@ -296,6 +296,66 @@ class WeatherService {
     }
 
     /**
+     * Get active weather alerts based on conditions
+     * Criteria: Wind > 60km/h, Snow, Storms
+     */
+    getAlerts() {
+        const alerts = [];
+        const cities = this.getAllCities();
+
+        cities.forEach(city => {
+            const data = this.getWeatherData(city);
+            if (!data) return;
+
+            const wind = data.current.wind_speed_10m;
+            const code = data.current.weather_code;
+
+            // Wind Alert
+            if (wind > 60) {
+                alerts.push({
+                    city: city,
+                    type: 'wind',
+                    level: 'warning',
+                    message: `Vientos fuertes de ${Math.round(wind)} km/h`,
+                    icon: 'fa-wind'
+                });
+            } else if (wind > 40) {
+                alerts.push({
+                    city: city,
+                    type: 'wind',
+                    level: 'info',
+                    message: `Ráfagas de ${Math.round(wind)} km/h`,
+                    icon: 'fa-wind'
+                });
+            }
+
+            // Snow Alert
+            if (code >= 71 && code <= 86) {
+                alerts.push({
+                    city: city,
+                    type: 'snow',
+                    level: 'warning',
+                    message: 'Nevadas activas',
+                    icon: 'fa-snowflake'
+                });
+            }
+
+            // Storm Alert
+            if (code >= 95) {
+                alerts.push({
+                    city: city,
+                    type: 'storm',
+                    level: 'danger',
+                    message: 'Tormenta eléctrica',
+                    icon: 'fa-bolt'
+                });
+            }
+        });
+
+        return alerts;
+    }
+
+    /**
      * Get weather modifier class for BEM
      */
     getWeatherModifier(code) {

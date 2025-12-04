@@ -13,6 +13,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Custom SASS Compiled CSS -->
     <link rel="stylesheet" href="css/main.css">
 </head>
@@ -43,6 +45,11 @@
                                     <i class="fas fa-map"></i> Mapa
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link navbar__link" href="#" onclick="showStats()">
+                                    <i class="fas fa-chart-bar"></i> Estadísticas
+                                </a>
+                            </li>
                         </ul>
                     </div>
                 </div>
@@ -57,7 +64,7 @@
                 <section id="home">
                     <!-- Update Info Banner -->
                     <div class="update-info">
-                        <i class="fas fa-sync"></i> Actualizado: 21/11/2025 11:17:47
+                        <i class="fas fa-sync"></i> Actualizado: --/--/---- --:--:--
                     </div>
 
                     <!-- Page Title -->
@@ -68,188 +75,7 @@
 
                     <!-- Weather Cards Grid -->
                     <div class="row g-4">
-
-                        <!-- Place Card 1: El Calafate -->
-                        <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
-                            <article class="place-card place-card--sunny" onclick="showDetail('El Calafate')">
-                                <div class="place-card__header">
-                                    <h2 class="place-card__name">El Calafate</h2>
-                                    <span class="place-card__distance">290 km</span>
-                                </div>
-                                <div class="place-card__body">
-                                    <div class="place-card__icon">
-                                        <i class="fas fa-cloud-sun"></i>
-                                    </div>
-                                    <div class="place-card__temp">13°C</div>
-                                    <div class="place-card__description">Parcialmente nublado</div>
-                                    <span class="place-card__badge">Ver detalle →</span>
-                                </div>
-                            </article>
-                        </div>
-
-                        <!-- Place Card 2: El Chaltén -->
-                        <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
-                            <article class="place-card place-card--snowy" onclick="showDetail('El Chaltén')">
-                                <div class="place-card__header">
-                                    <h2 class="place-card__name">El Chaltén</h2>
-                                    <span class="place-card__distance">490 km</span>
-                                </div>
-                                <div class="place-card__body">
-                                    <div class="place-card__icon">
-                                        <i class="fas fa-snowflake"></i>
-                                    </div>
-                                    <div class="place-card__temp">-1°C</div>
-                                    <div class="place-card__description">Nieve ligera</div>
-                                    <span class="place-card__badge">Ver detalle →</span>
-                                </div>
-                            </article>
-                        </div>
-
-                        <!-- Place Card 3: Glaciar Perito Moreno -->
-                        <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
-                            <article class="place-card place-card--sunny" onclick="showDetail('Glaciar Perito Moreno')">
-                                <div class="place-card__header">
-                                    <h2 class="place-card__name">Glaciar Perito Moreno</h2>
-                                    <span class="place-card__distance">350 km</span>
-                                </div>
-                                <div class="place-card__body">
-                                    <div class="place-card__icon">
-                                        <i class="fas fa-cloud-sun"></i>
-                                    </div>
-                                    <div class="place-card__temp">10°C</div>
-                                    <div class="place-card__description">Parcialmente nublado</div>
-                                    <span class="place-card__badge">Ver detalle →</span>
-                                </div>
-                            </article>
-                        </div>
-
-                        <!-- Place Card 4: Gobernador Gregores -->
-                        <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
-                            <article class="place-card place-card--sunny" onclick="showDetail('Gobernador Gregores')">
-                                <div class="place-card__header">
-                                    <h2 class="place-card__name">Gobernador Gregores</h2>
-                                    <span class="place-card__distance">520 km</span>
-                                </div>
-                                <div class="place-card__body">
-                                    <div class="place-card__icon">
-                                        <i class="fas fa-cloud-sun"></i>
-                                    </div>
-                                    <div class="place-card__temp">13°C</div>
-                                    <div class="place-card__description">Mayormente despejado</div>
-                                    <span class="place-card__badge">Ver detalle →</span>
-                                </div>
-                            </article>
-                        </div>
-
-                        <!-- Place Card 5: Puerto Natales -->
-                        <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
-                            <article class="place-card place-card--cloudy" onclick="showDetail('Puerto Natales')">
-                                <div class="place-card__header">
-                                    <h2 class="place-card__name">Puerto Natales</h2>
-                                    <span class="place-card__distance">105 km</span>
-                                </div>
-                                <div class="place-card__body">
-                                    <div class="place-card__icon">
-                                        <i class="fas fa-cloud"></i>
-                                    </div>
-                                    <div class="place-card__temp">12°C</div>
-                                    <div class="place-card__description">Nublado</div>
-                                    <span class="place-card__badge">Ver detalle →</span>
-                                </div>
-                            </article>
-                        </div>
-
-                        <!-- Place Card 6: Punta Arenas -->
-                        <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
-                            <article class="place-card place-card--cloudy" onclick="showDetail('Punta Arenas')">
-                                <div class="place-card__header">
-                                    <h2 class="place-card__name">Punta Arenas</h2>
-                                    <span class="place-card__distance">350 km</span>
-                                </div>
-                                <div class="place-card__body">
-                                    <div class="place-card__icon">
-                                        <i class="fas fa-cloud"></i>
-                                    </div>
-                                    <div class="place-card__temp">14°C</div>
-                                    <div class="place-card__description">Nublado</div>
-                                    <span class="place-card__badge">Ver detalle →</span>
-                                </div>
-                            </article>
-                        </div>
-
-                        <!-- Place Card 7: Río Gallegos -->
-                        <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
-                            <article class="place-card place-card--cloudy" onclick="showDetail('Río Gallegos')">
-                                <div class="place-card__header">
-                                    <h2 class="place-card__name">Río Gallegos</h2>
-                                    <span class="place-card__distance">580 km</span>
-                                </div>
-                                <div class="place-card__body">
-                                    <div class="place-card__icon">
-                                        <i class="fas fa-cloud"></i>
-                                    </div>
-                                    <div class="place-card__temp">12°C</div>
-                                    <div class="place-card__description">Nublado</div>
-                                    <span class="place-card__badge">Ver detalle →</span>
-                                </div>
-                            </article>
-                        </div>
-
-                        <!-- Place Card 8: Torres del Paine - Glaciar Grey -->
-                        <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
-                            <article class="place-card place-card--rainy"
-                                onclick="showDetail('Torres del Paine - Glaciar Grey')">
-                                <div class="place-card__header">
-                                    <h2 class="place-card__name">Torres del Paine - Glaciar Grey</h2>
-                                    <span class="place-card__distance">0 km</span>
-                                </div>
-                                <div class="place-card__body">
-                                    <div class="place-card__icon">
-                                        <i class="fas fa-cloud-rain"></i>
-                                    </div>
-                                    <div class="place-card__temp">2°C</div>
-                                    <div class="place-card__description">Lluvia ligera</div>
-                                    <span class="place-card__badge">Ver detalle →</span>
-                                </div>
-                            </article>
-                        </div>
-
-                        <!-- Place Card 9: Tres Lagos -->
-                        <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
-                            <article class="place-card place-card--cloudy" onclick="showDetail('Tres Lagos')">
-                                <div class="place-card__header">
-                                    <h2 class="place-card__name">Tres Lagos</h2>
-                                    <span class="place-card__distance">400 km</span>
-                                </div>
-                                <div class="place-card__body">
-                                    <div class="place-card__icon">
-                                        <i class="fas fa-cloud"></i>
-                                    </div>
-                                    <div class="place-card__temp">11°C</div>
-                                    <div class="place-card__description">Nublado</div>
-                                    <span class="place-card__badge">Ver detalle →</span>
-                                </div>
-                            </article>
-                        </div>
-
-                        <!-- Place Card 10: Villa O'Higgins -->
-                        <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
-                            <article class="place-card place-card--rainy" onclick="showDetail('Villa O\'Higgins')">
-                                <div class="place-card__header">
-                                    <h2 class="place-card__name">Villa O'Higgins</h2>
-                                    <span class="place-card__distance">285 km</span>
-                                </div>
-                                <div class="place-card__body">
-                                    <div class="place-card__icon">
-                                        <i class="fas fa-cloud-rain"></i>
-                                    </div>
-                                    <div class="place-card__temp">5°C</div>
-                                    <div class="place-card__description">Lluvia ligera</div>
-                                    <span class="place-card__badge">Ver detalle →</span>
-                                </div>
-                            </article>
-                        </div>
-
+                        <!-- Cards will be injected here by JS -->
                     </div>
 
                     <!-- Torres del Paine Info Card -->
@@ -299,6 +125,40 @@
                             <span class="map-toggle"><i class="fas fa-chevron-down"></i></span>
                         </div>
                         <div id="mapContainer"></div>
+                    </div>
+                </section>
+
+                <!-- Stats & Alerts View (Initially Hidden) -->
+                <section id="stats" style="display:none;">
+                    <h2 class="page-title"><i class="fas fa-chart-line"></i> Análisis Regional</h2>
+
+                    <!-- Alerts Container -->
+                    <div id="alertsContainer" class="mb-5">
+                        <!-- Alerts will be injected here JS -->
+                    </div>
+
+                    <!-- Charts Grid -->
+                    <div class="row">
+                        <div class="col-lg-6 mb-4">
+                            <div class="chart-container"
+                                style="background: white; padding: 1rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                                <h4 class="text-center mb-3 text-primary">Velocidad del Viento (km/h)</h4>
+                                <canvas id="windChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 mb-4">
+                            <div class="chart-container"
+                                style="background: white; padding: 1rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                                <h4 class="text-center mb-3 text-primary">Temperaturas Actuales (°C)</h4>
+                                <canvas id="tempChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <button class="btn btn-custom" onclick="goHome()">
+                            <i class="fas fa-arrow-left"></i> Volver al Inicio
+                        </button>
                     </div>
                 </section>
 
