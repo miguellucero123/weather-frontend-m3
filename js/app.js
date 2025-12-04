@@ -13,11 +13,133 @@ let mapInitialized = false;
 const TORRES_DEL_PAINE = [-51.0000, -73.2300];
 
 /**
+ * Initialize app on DOM ready
+ */
+document.addEventListener('DOMContentLoaded', function () {
+    console.log('ClimaTorre App initialized');
+
+    // Listen for weather updates
+    window.addEventListener('weatherUpdated', (e) => {
+        updateUI(e.detail.timestamp);
+    });
+
+    // Initial render (will use cache or wait for API)
+    // If data is already there (sync cache), render immediately
+    if (weatherService.getLastUpdate()) {
+        updateUI(weatherService.getLastUpdate());
+    }
+
+    setupNavigation();
+});
+
+/**
+ * Update all UI elements with fresh data
+ */
+function updateUI(timestamp) {
+    renderWeatherCards();
+    updateTorresWidget();
+    updateLastUpdatedInfo(timestamp);
+
+    // Update map if it's already initialized
+    if (mapInitialized && map) {
+        updateMapMarkers();
+    }
+}
+
+/**
+ * Render weather cards dynamically
+ */
+function renderWeatherCards() {
+    const gridContainer = document.querySelector('.row.g-4');
+    if (!gridContainer) return;
+
+    gridContainer.innerHTML = ''; // Clear static content
+
+    const cities = weatherService.getAllCities();
+
+    cities.forEach(cityName => {
+        const data = weatherService.getWeatherData(cityName);
+        if (!data) return;
+
+        const current = data.current;
+        const weatherCode = current.weather_code;
+        const temp = Math.round(current.temperature_2m);
+        const desc = weatherService.getWeatherDescription(weatherCode);
+        const iconClass = weatherService.getWeatherIcon(weatherCode);
+        const modifier = weatherService.getWeatherModifier(weatherCode);
+
+        const cardHtml = `
+            <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+                <article class="place-card place-card--${modifier}" onclick="showDetail('${cityName}')">
+                    <div class="place-card__header">
+                        <h2 class="place-card__name">${cityName}</h2>
+                        <span class="place-card__distance">${data.city.distance} km</span>
+                    </div>
+                    <div class="place-card__body">
+                        <div class="place-card__icon">
+                            <i class="fas ${iconClass}"></i>
+                        </div>
+                        <div class="place-card__temp">${temp}°C</div>
+                        <div class="place-card__description">${desc}</div>
+                        <span class="place-card__badge">Ver detalle →</span>
+                    </div>
+                </article>
+            </div>
+        `;
+
+        gridContainer.insertAdjacentHTML('beforeend', cardHtml);
+    });
+}
+
+/**
+ * Update the specific Torres del Paine widget
+ */
+function updateTorresWidget() {
+    const torresData = weatherService.getWeatherData('Torres del Paine - Glaciar Grey');
+    if (torresData) {
+        const temp = Math.round(torresData.current.temperature_2m);
+        const tempWidget = document.getElementById('torres-temp-widget');
+        if (tempWidget) {
+            tempWidget.innerText = temp + '°C';
+        }
+    }
+}
+
+/**
+ * Update the "Last Updated" banner
+ */
+function updateLastUpdatedInfo(date) {
+    const infoElement = document.querySelector('.update-info');
+    if (infoElement && date) {
+        const formattedDate = new Date(date).toLocaleString('es-CL');
+        infoElement.innerHTML = `<i class="fas fa-sync"></i> Actualizado: ${formattedDate}`;
+    }
+}
+
+/**
+ * Setup navigation events
+ */
+function setupNavigation() {
+    // Add smooth scroll to all nav links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            const href = this.getAttribute('href');
+            if (href !== '#' && href.length > 1) {
+                e.preventDefault();
+                const target = document.querySelector(href);
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            }
+        });
+    });
+}
+
+/**
  * Scroll to map section
  */
 function scrollToMap() {
     document.getElementById('mapa').scrollIntoView({ behavior: 'smooth' });
-    // Auto-open map if not already open
     const container = document.getElementById('mapContainer');
     if (!container.classList.contains('show')) {
         toggleMap();
@@ -51,10 +173,28 @@ function toggleMap() {
 function initializeMap() {
     map = L.map('mapContainer').setView(TORRES_DEL_PAINE, 7);
 
-    // Add tile layer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors'
     }).addTo(map);
+
+    updateMapMarkers();
+
+    // Fix map display issues
+    setTimeout(() => {
+        map.invalidateSize();
+    }, 100);
+}
+
+/**
+ * Update Map Markers with current data
+ */
+function updateMapMarkers() {
+    // Clear existing markers (optional, but good practice if updating)
+    map.eachLayer((layer) => {
+        if (layer instanceof L.CircleMarker) {
+            map.removeLayer(layer);
+        }
+    });
 
     // Add Torres del Paine marker
     L.circleMarker(TORRES_DEL_PAINE, {
@@ -91,11 +231,6 @@ function initializeMap() {
             }).addTo(map).bindPopup(`${cityName} - ${temp}°C`);
         }
     });
-
-    // Fix map display issues
-    setTimeout(() => {
-        map.invalidateSize();
-    }, 100);
 }
 
 /**
@@ -104,13 +239,11 @@ function initializeMap() {
 function goHome() {
     document.getElementById('home').style.display = 'block';
     document.getElementById('detail').style.display = 'none';
-    // Scroll to top
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 /**
  * Show detail view for a city
- * @param {string} city - City name
  */
 function showDetail(city) {
     const data = weatherService.getWeatherData(city);
@@ -121,11 +254,13 @@ function showDetail(city) {
 
     const current = data.current;
     const daily = data.daily;
+    const desc = weatherService.getWeatherDescription(current.weather_code);
 
     // Build detail HTML
     let html = `
         <div class="detail-header">
             <h2><i class="fas fa-location-dot"></i> ${city}</h2>
+            <p class="text-center text-muted">${desc}</p>
             <div class="weather-details">
                 <div class="detail-item">
                     <div class="detail-item__label">Temperatura</div>
@@ -161,11 +296,16 @@ function showDetail(city) {
             month: 'short',
             day: 'numeric'
         });
+        const dayCode = daily.weather_code[i];
+        const dayIcon = weatherService.getWeatherIcon(dayCode);
 
         html += `
             <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
                 <div class="forecast-card" onclick="showDayDetail('${city}', ${i})">
                     <div class="forecast-card__day">${dateStr}</div>
+                    <div style="font-size: 1.5rem; color: var(--secondary); margin: 0.5rem 0;">
+                        <i class="fas ${dayIcon}"></i>
+                    </div>
                     <div class="forecast-card__temps">
                         <strong>${Math.round(daily.temperature_2m_max[i])}°C</strong> / 
                         ${Math.round(daily.temperature_2m_min[i])}°C
@@ -196,14 +336,11 @@ function showDetail(city) {
     document.getElementById('home').style.display = 'none';
     document.getElementById('detail').style.display = 'block';
 
-    // Scroll to top
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 /**
  * Show detailed information for a specific day
- * @param {string} city - City name
- * @param {number} dayIndex - Index of the day in the forecast array
  */
 function showDayDetail(city, dayIndex) {
     const data = weatherService.getWeatherData(city);
@@ -255,34 +392,3 @@ function showDayDetail(city, dayIndex) {
         block: 'start'
     });
 }
-
-/**
- * Initialize app on DOM ready
- */
-document.addEventListener('DOMContentLoaded', function () {
-    console.log('ClimaTorre App initialized');
-
-    // Update Torres del Paine temperature widget
-    const torresData = weatherService.getWeatherData('Torres del Paine - Glaciar Grey');
-    if (torresData) {
-        const temp = Math.round(torresData.current.temperature_2m);
-        const tempWidget = document.getElementById('torres-temp-widget');
-        if (tempWidget) {
-            tempWidget.innerText = temp + '°C';
-        }
-    }
-
-    // Add smooth scroll to all nav links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            const href = this.getAttribute('href');
-            if (href !== '#' && href.length > 1) {
-                e.preventDefault();
-                const target = document.querySelector(href);
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth' });
-                }
-            }
-        });
-    });
-});
