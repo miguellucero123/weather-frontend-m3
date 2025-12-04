@@ -139,6 +139,23 @@
 
                     <!-- City Selection Tabs -->
                     <div class="city-tabs-container mb-4">
+                        <ul class="nav nav-pills flex-nowrap" id="cityTabs"
+                            style="overflow-x: auto; padding-bottom: 5px;">
+                            <!-- Tabs injected by JS -->
+                        </ul>
+                    </div>
+
+                    <!-- Chart Container -->
+                    <div class="chart-container"
+                        style="position: relative; height: 50vh; min-height: 300px; background: white; padding: 1rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                        <h4 class="text-center mb-3 text-primary" id="chartTitle">Temperaturas Máx/Mín</h4>
+                        <canvas id="forecastChart"></canvas>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <button class="btn btn-custom" onclick="goHome()">
+                            <i class="fas fa-arrow-left"></i> Volver al Inicio
+                        </button>
                     </div>
                 </section>
 
