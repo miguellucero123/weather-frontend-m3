@@ -1,0 +1,200 @@
+// Main Weather App Container
+.weather-app {
+    @include gradient-background($gradient-primary);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+
+    &__header {
+        position: sticky;
+        top: 0;
+        z-index: $z-index-navbar;
+    }
+
+    &__main {
+        flex: 1;
+        padding: $spacing-xxl $spacing-md;
+
+        @include mobile {
+            padding: $spacing-lg $spacing-sm;
+        }
+    }
+
+    &__footer {
+        margin-top: auto;
+    }
+}
+
+// Container
+.container-lg {
+    @include container-centered(1200px);
+}
+
+// Page Title
+.page-title {
+    color: $color-white;
+    text-align: center;
+    margin-bottom: $spacing-xxl;
+    font-weight: $font-weight-bold;
+    font-size: $font-size-h1;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+
+    @include mobile {
+        font-size: $font-size-h2;
+        margin-bottom: $spacing-lg;
+    }
+
+    i {
+        margin-right: $spacing-sm;
+    }
+}
+
+// Update Info Banner
+.update-info {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: $color-white;
+    padding: $spacing-md;
+    border-radius: $border-radius-sm;
+    margin-bottom: $spacing-xl;
+    text-align: center;
+
+    i {
+        margin-right: $spacing-sm;
+    }
+}
+
+// Section Subtitle
+.section-subtitle {
+    text-align: center;
+    color: $color-white;
+    margin-bottom: $spacing-xl;
+    font-size: $font-size-large;
+}
+
+// Map Section
+.map-section {
+    background: $color-white;
+    border-radius: $border-radius-md;
+    overflow: hidden;
+    @include card-shadow('md');
+    margin-bottom: $spacing-xl;
+    margin-top: $spacing-xxl;
+}
+
+.map-header {
+    @include gradient-background($gradient-secondary);
+    @include flex-between;
+    color: $color-white;
+    padding: $spacing-lg;
+    cursor: pointer;
+    user-select: none;
+    transition: background $transition-fast;
+
+    &:hover {
+        background: linear-gradient(135deg, $color-primary, $color-secondary);
+    }
+
+    h3 {
+        margin: 0;
+        font-size: $font-size-h3;
+
+        i {
+            margin-right: $spacing-sm;
+        }
+    }
+}
+
+.map-toggle {
+    font-size: $font-size-xlarge;
+    transition: transform $transition-fast;
+
+    &.collapsed {
+        transform: rotate(180deg);
+    }
+}
+
+#mapContainer {
+    height: 500px;
+    width: 100%;
+    display: none;
+
+    &.show {
+        display: block;
+    }
+
+    @include mobile {
+        height: 300px;
+    }
+}
+
+// Detail View
+#detail {
+    display: none;
+
+    &.show {
+        display: block;
+    }
+}
+
+.detail-header {
+    background: $color-white;
+    border-radius: $border-radius-md;
+    padding: $spacing-xl;
+    margin-bottom: $spacing-xl;
+    @include card-shadow('md');
+
+    h2 {
+        color: $color-primary;
+        margin-bottom: $spacing-lg;
+
+        i {
+            margin-right: $spacing-sm;
+        }
+    }
+}
+
+.weather-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: $spacing-lg;
+    margin-top: $spacing-xl;
+}
+
+.detail-item {
+    background: $color-light;
+    padding: $spacing-lg;
+    border-radius: $border-radius-sm;
+    text-align: center;
+    border-left: 4px solid $color-accent;
+
+    &__label {
+        font-size: $font-size-small;
+        color: $color-text-muted;
+        text-transform: uppercase;
+        font-weight: $font-weight-medium;
+        margin-bottom: $spacing-sm;
+    }
+
+    &__value {
+        font-size: 1.8rem;
+        font-weight: $font-weight-bold;
+        color: $color-primary;
+    }
+}
+
+// Forecast Section
+.forecast-section {
+    background: $color-white;
+    border-radius: $border-radius-md;
+    padding: $spacing-xl;
+    @include card-shadow('md');
+    margin-bottom: $spacing-xl;
+}
+
+.forecast-title {
+    font-size: $font-size-xlarge;
+    font-weight: $font-weight-bold;
+    color: $color-primary;
+    margin-bottom: $spacing-lg;
+}

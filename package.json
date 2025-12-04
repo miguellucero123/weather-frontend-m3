@@ -1,0 +1,22 @@
+{
+  "name": "modulo3_portafolio",
+  "version": "1.0.0",
+  "description": "Torres del Paine Weather App - Module 3 Portfolio with BEM, SASS, and Bootstrap 4",
+  "main": "index.js",
+  "scripts": {
+    "build-css": "sass scss/main.scss css/main.css",
+    "watch-css": "sass --watch scss/main.scss css/main.css",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "weather",
+    "sass",
+    "bem",
+    "bootstrap"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "sass": "^1.94.2"
+  }
+}

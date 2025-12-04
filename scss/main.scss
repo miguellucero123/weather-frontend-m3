@@ -1,0 +1,14 @@
+// Main SCSS Entry Point
+// Import Base Styles
+@import 'base/variables';
+@import 'base/mixins';
+@import 'base/reset';
+
+// Import Layout
+@import 'layout/layout';
+
+// Import Components
+@import 'components/navbar';
+@import 'components/place-card';
+@import 'components/buttons';
+@import 'components/footer';

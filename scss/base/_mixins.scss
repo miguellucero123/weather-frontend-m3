@@ -1,0 +1,93 @@
+// Responsive Breakpoint Mixins
+@mixin mobile {
+    @media (max-width: #{$breakpoint-mobile}) {
+        @content;
+    }
+}
+
+@mixin tablet {
+    @media (min-width: #{$breakpoint-tablet}) {
+        @content;
+    }
+}
+
+@mixin desktop {
+    @media (min-width: #{$breakpoint-desktop}) {
+        @content;
+    }
+}
+
+// Flexbox Helpers
+@mixin flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+@mixin flex-between {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+@mixin flex-column {
+    display: flex;
+    flex-direction: column;
+}
+
+// Card Styling Mixin
+@mixin card-shadow($level: 'md') {
+    @if $level =='sm' {
+        box-shadow: $shadow-sm;
+    }
+
+    @else if $level =='md' {
+        box-shadow: $shadow-md;
+    }
+
+    @else if $level =='lg' {
+        box-shadow: $shadow-lg;
+    }
+}
+
+// Button Variant Mixin
+@mixin button-variant($bg-color, $text-color: $color-white) {
+    background: $bg-color;
+    color: $text-color;
+    border: none;
+    padding: $spacing-md $spacing-xl;
+    border-radius: $border-radius-sm;
+    font-weight: $font-weight-medium;
+    text-decoration: none;
+    transition: all $transition-fast;
+    cursor: pointer;
+
+    &:hover {
+        background: darken($bg-color, 10%);
+        transform: translateY(-2px);
+        box-shadow: $shadow-md;
+    }
+
+    &:active {
+        transform: translateY(0);
+    }
+}
+
+// Gradient Background Mixin
+@mixin gradient-background($gradient) {
+    background: $gradient;
+}
+
+// Text Truncate
+@mixin text-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+// Centered Container
+@mixin container-centered($max-width: 1200px) {
+    max-width: $max-width;
+    margin: 0 auto;
+    padding: 0 $spacing-md;
+}

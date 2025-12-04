@@ -1,0 +1,32 @@
+// Navbar Component (BEM)
+.navbar {
+    &__brand {
+        font-weight: $font-weight-bold;
+        font-size: $font-size-xlarge;
+        color: $color-white !important;
+
+        i {
+            margin-right: $spacing-sm;
+            color: $color-accent;
+        }
+    }
+
+    &__link {
+        color: rgba(255, 255, 255, 0.8) !important;
+        transition: color $transition-fast;
+
+        &:hover {
+            color: $color-accent !important;
+        }
+
+        &.active {
+            color: $color-white !important;
+        }
+    }
+}
+
+// Custom Navbar Styles
+.navbar-custom {
+    background: linear-gradient(90deg, $color-primary 0%, $color-secondary 100%);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
