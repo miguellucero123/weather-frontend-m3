@@ -363,7 +363,7 @@ ISC License - Este proyecto es de uso educativo.
 
 ## 🔗 Enlaces
 
-- **Repositorio GitHub**: [https://github.com/usuario/weather-frontend-m3](https://github.com/usuario/weather-frontend-m3)
+- **Repositorio GitHub**: [https://github.com/miguellucero123/weather-frontend-m3](https://github.com/miguellucero123/weather-frontend-m3)
 - **Open-Meteo API**: [https://open-meteo.com/](https://open-meteo.com/)
 - **BEM Methodology**: [https://getbem.com/](https://getbem.com/)
 - **SASS Documentation**: [https://sass-lang.com/](https://sass-lang.com/)
