@@ -13,8 +13,8 @@ let mapInitialized = false;
 const TORRES_DEL_PAINE = [-51.0000, -73.2300];
 
 // Chart variables
-let windChart = null;
-let tempChart = null;
+let forecastChart = null;
+let currentStatsCity = null;
 
 /**
  * Initialize app on DOM ready
@@ -51,8 +51,12 @@ function updateUI(timestamp) {
     // Update charts if stats view is active
     const statsSection = document.getElementById('stats');
     if (statsSection.style.display === 'block') {
-        renderCharts();
         renderAlerts();
+        if (currentStatsCity) {
+            renderForecastChart(currentStatsCity);
+        } else {
+            renderCityTabs(); // Initialize tabs if not already done
+        }
     }
 }
 
@@ -148,7 +152,7 @@ function setupNavigation() {
  * Scroll to map section
  */
 function scrollToMap() {
-    goHome(); // Ensure we are on home view
+    goHome();
     setTimeout(() => {
         document.getElementById('mapa').scrollIntoView({ behavior: 'smooth' });
         const container = document.getElementById('mapContainer');
@@ -248,7 +252,6 @@ function goHome() {
     document.getElementById('detail').style.display = 'none';
     document.getElementById('stats').style.display = 'none';
 
-    // Update active nav link
     document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
     document.querySelector('a[onclick="goHome()"]').classList.add('active');
 
@@ -263,78 +266,152 @@ function showStats() {
     document.getElementById('detail').style.display = 'none';
     document.getElementById('stats').style.display = 'block';
 
-    // Update active nav link
     document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
     document.querySelector('a[onclick="showStats()"]').classList.add('active');
 
-    renderCharts();
     renderAlerts();
+    renderCityTabs();
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 /**
- * Render Charts using Chart.js
+ * Render City Tabs for Statistics
  */
-function renderCharts() {
+function renderCityTabs() {
     const cities = weatherService.getAllCities();
-    const labels = cities.map(c => c.replace('Torres del Paine - ', '')); // Shorten names
+    const tabsContainer = document.getElementById('cityTabs');
 
-    const windData = [];
-    const tempData = [];
+    if (!tabsContainer) return;
 
-    cities.forEach(city => {
-        const data = weatherService.getWeatherData(city);
-        if (data) {
-            windData.push(data.current.wind_speed_10m);
-            tempData.push(data.current.temperature_2m);
-        }
+    let html = '';
+    cities.forEach((city, index) => {
+        const isActive = index === 0 ? 'active' : '';
+        // Shorten name for tab if too long
+        const shortName = city.replace('Torres del Paine - ', '').replace('Glaciar ', '');
+
+        html += `
+            <li class="nav-item">
+                <a class="nav-link ${isActive}" href="#" onclick="selectCityStats('${city}', this); return false;">
+                    ${shortName}
+                </a>
+            </li>
+        `;
     });
 
-    // Wind Chart
-    const windCtx = document.getElementById('windChart').getContext('2d');
-    if (windChart) windChart.destroy();
+    tabsContainer.innerHTML = html;
 
-    windChart = new Chart(windCtx, {
-        type: 'bar',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: 'Viento (km/h)',
-                data: windData,
-                backgroundColor: 'rgba(0, 188, 212, 0.6)',
-                borderColor: 'rgba(0, 188, 212, 1)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: { beginAtZero: true }
-            }
-        }
+    // Select first city by default
+    if (cities.length > 0) {
+        selectCityStats(cities[0]);
+    }
+}
+
+/**
+ * Select a city to show stats for
+ */
+function selectCityStats(city, element) {
+    currentStatsCity = city;
+
+    // Update active tab styling
+    if (element) {
+        document.querySelectorAll('#cityTabs .nav-link').forEach(link => link.classList.remove('active'));
+        element.classList.add('active');
+    }
+
+    // Update Chart Title
+    document.getElementById('chartTitle').innerText = `${city}: Pronóstico 7 Días`;
+
+    renderForecastChart(city);
+}
+
+/**
+ * Render Forecast Chart (Max/Min) for a specific city
+ */
+function renderForecastChart(city) {
+    const data = weatherService.getWeatherData(city);
+    if (!data) return;
+
+    const daily = data.daily;
+    const labels = daily.time.map(t => {
+        const date = new Date(t);
+        return date.toLocaleDateString('es-CL', { weekday: 'short', day: 'numeric' });
     });
 
-    // Temp Chart
-    const tempCtx = document.getElementById('tempChart').getContext('2d');
-    if (tempChart) tempChart.destroy();
+    const ctx = document.getElementById('forecastChart').getContext('2d');
 
-    tempChart = new Chart(tempCtx, {
+    if (forecastChart) {
+        forecastChart.destroy();
+    }
+
+    forecastChart = new Chart(ctx, {
         type: 'line',
         data: {
             labels: labels,
-            datasets: [{
-                label: 'Temperatura (°C)',
-                data: tempData,
-                backgroundColor: 'rgba(255, 152, 0, 0.2)',
-                borderColor: 'rgba(255, 152, 0, 1)',
-                borderWidth: 2,
-                tension: 0.4,
-                fill: true
-            }]
+            datasets: [
+                {
+                    label: 'Máxima (°C)',
+                    data: daily.temperature_2m_max,
+                    borderColor: '#ff9800', // Orange
+                    backgroundColor: 'rgba(255, 152, 0, 0.1)',
+                    borderWidth: 3,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointBackgroundColor: '#fff',
+                    pointBorderColor: '#ff9800',
+                    fill: false
+                },
+                {
+                    label: 'Mínima (°C)',
+                    data: daily.temperature_2m_min,
+                    borderColor: '#03a9f4', // Light Blue
+                    backgroundColor: 'rgba(3, 169, 244, 0.1)',
+                    borderWidth: 3,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointBackgroundColor: '#fff',
+                    pointBorderColor: '#03a9f4',
+                    fill: false
+                }
+            ]
         },
         options: {
-            responsive: true
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 20,
+                        font: { size: 14 }
+                    }
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                    backgroundColor: 'rgba(0,0,0,0.8)',
+                    titleFont: { size: 14 },
+                    bodyFont: { size: 13 },
+                    padding: 10,
+                    cornerRadius: 8
+                }
+            },
+            scales: {
+                y: {
+                    grid: { color: '#f0f0f0' },
+                    ticks: { font: { size: 12 } }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { font: { size: 12 } }
+                }
+            },
+            interaction: {
+                mode: 'nearest',
+                axis: 'x',
+                intersect: false
+            }
         }
     });
 }

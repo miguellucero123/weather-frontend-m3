@@ -8,8 +8,12 @@ Aplicación web de pronóstico meteorológico para Torres del Paine y áreas cir
 
 ## 📋 Descripción del Proyecto
 
-ClimaTorre es una aplicación meteorológica que muestra el pronóstico de 7 días para 10 ubicaciones estratégicas alrededor del Parque Nacional Torres del Paine, incluyendo:
+ClimaTorre es una aplicación meteorológica avanzada que muestra el pronóstico de 7 días para 10 ubicaciones estratégicas alrededor del Parque Nacional Torres del Paine.
 
+**¡AHORA CON DATOS EN TIEMPO REAL!** 🚀
+La aplicación se conecta directamente a la API de Open-Meteo para ofrecer datos precisos y actualizados al instante.
+
+### Ubicaciones Cubiertas:
 - **Torres del Paine - Glaciar Grey** (punto de referencia principal)
 - Puerto Natales, Punta Arenas (Chile)
 - El Calafate, El Chaltén, Glaciar Perito Moreno, Río Gallegos, Tres Lagos, Gobernador Gregores (Argentina)
@@ -17,6 +21,27 @@ ClimaTorre es una aplicación meteorológica que muestra el pronóstico de 7 dí
 
 ### Temática
 La aplicación se centra en **condiciones climáticas de montaña y glaciares**, proporcionando información vital para excursionistas, montañistas y turistas que visitan la región patagónica.
+
+---
+
+## 🌟 Nuevas Funcionalidades (Actualización)
+
+Esta versión incluye características avanzadas que llevan el proyecto al siguiente nivel:
+
+### 1. 📡 Datos en Tiempo Real (API Integration)
+- Conexión directa con **Open-Meteo API**.
+- **Actualización Automática:** El sistema verifica y actualiza los datos automáticamente a las **08:00 AM** y **08:00 PM** (20:00 hrs) todos los días.
+- **Caché Inteligente:** Los datos se guardan localmente para una carga instantánea y funcionamiento offline.
+
+### 2. 📊 Dashboard de Estadísticas
+- **Gráficos Interactivos:** Implementación de **Chart.js**.
+- **Pestañas por Ciudad:** Navegación fluida entre las 10 estaciones.
+- **Pronóstico Visual:** Gráfico de líneas comparativo de temperaturas Máximas y Mínimas para los próximos 7 días.
+
+### 3. ⚠️ Sistema de Alertas Inteligentes
+- **Detección de Riesgos:** Análisis automático de condiciones peligrosas.
+- **Alertas de Viento:** Advertencias visuales para vientos >40 km/h y >60 km/h (crítico en la Patagonia).
+- **Alertas de Nieve y Tormentas:** Notificaciones inmediatas sobre condiciones adversas.
 
 ---
 
@@ -29,6 +54,8 @@ Esta iteración del proyecto se enfoca en:
 3. ✅ **Modelo de cajas y conceptos de layout** (posicionamiento, flexbox, grid)
 4. ✅ **Bootstrap 4** para sistema de grid y componentes
 5. ✅ **Gestión Git/GitHub** con commits descriptivos
+6. ✅ **Consumo de APIs REST** y manejo de asincronía (Async/Await)
+7. ✅ **Visualización de Datos** con librerías de terceros (Chart.js)
 
 ---
 
@@ -72,25 +99,6 @@ Esta iteración del proyecto se enfoca en:
 - `.place-card--snowy` (nevado)
 - `.place-card--cloudy` (nublado)
 
-#### Componente: Navbar
-```html
-<nav class="navbar navbar-custom">
-    <a class="navbar__brand">...</a>
-    <a class="navbar__link">...</a>
-</nav>
-```
-
-#### Componente: Footer
-```html
-<footer class="footer">
-    <div class="footer__content">
-        <p class="footer__title">...</p>
-        <p class="footer__text">...</p>
-        <a class="footer__link">...</a>
-    </div>
-</footer>
-```
-
 ---
 
 ## 📁 Estructura SASS
@@ -113,91 +121,6 @@ scss/
 └── main.scss               # Archivo principal que importa todos los parciales
 ```
 
-### Descripción de Parciales
-
-#### `_variables.scss`
-Define todos los **tokens de diseño**:
-- **Colores**: Primario, secundario, acento, luz, oscuro
-- **Tipografía**: Familias, tamaños, pesos
-- **Espaciado**: Escala de márgenes y paddings
-- **Breakpoints**: Mobile (420px), Tablet (768px), Desktop (1024px)
-- **Sombras**: Niveles de elevación
-- **Transiciones**: Duraciones
-
-Ejemplo:
-```scss
-$color-primary: #0d47a1;
-$color-secondary: #1976d2;
-$color-accent: #00bcd4;
-$spacing-md: 1rem;
-$breakpoint-mobile: 420px;
-```
-
-#### `_mixins.scss`
-**Funciones reutilizables** para evitar repetición:
-
-1. **Media Queries**:
-```scss
-@mixin mobile {
-    @media (max-width: 420px) { @content; }
-}
-@mixin desktop {
-    @media (min-width: 1024px) { @content; }
-}
-```
-
-2. **Flexbox Helpers**:
-```scss
-@mixin flex-center {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-```
-
-3. **Variantes de Botones**:
-```scss
-@mixin button-variant($bg-color, $text-color) {
-    background: $bg-color;
-    color: $text-color;
-    // ... más estilos
-}
-```
-
-#### `_reset.scss`
-Normalización y **box-sizing reset**:
-```scss
-*, *::before, *::after {
-    box-sizing: border-box;
-}
-```
-
-#### `_layout.scss`
-Estructura de **nivel de página**:
-- `.weather-app` (contenedor principal)
-- `.weather-app__header` (encabezado)
-- `.weather-app__main` (contenido principal)
-- `.weather-app__footer` (pie de página)
-
-#### `_place-card.scss`
-Componente de **tarjeta de clima** con BEM completo, incluyendo:
-- Estados hover y transiciones
-- Modificadores por tipo de clima
-- Layout flexbox interno
-
-#### `main.scss`
-**Punto de entrada** que importa todos los parciales en orden:
-```scss
-@import 'base/variables';
-@import 'base/mixins';
-@import 'base/reset';
-@import 'layout/layout';
-@import 'components/navbar';
-@import 'components/place-card';
-@import 'components/buttons';
-@import 'components/footer';
-```
-
 ---
 
 ## 🚀 Tecnologías Utilizadas
@@ -208,7 +131,9 @@ Componente de **tarjeta de clima** con BEM completo, incluyendo:
 - **Bootstrap 4.6.2** - Sistema de grid y componentes
 - **JavaScript (ES6+)** - Lógica de aplicación
 - **Leaflet.js** - Mapas interactivos
+- **Chart.js** - Gráficos y visualización de datos
 - **Font Awesome 6** - Iconografía
+- **Open-Meteo API** - Fuente de datos meteorológicos
 
 ---
 
@@ -265,28 +190,6 @@ Luego navega a `http://localhost:8000`
 | **Tablet** | ≥ 768px | 2 columnas (`col-md-6`) |
 | **Desktop** | ≥ 1024px | 3-4 columnas (`col-lg-4 col-xl-3`) |
 
-### Bootstrap Grid Implementado
-
-```html
-<div class="row g-4">
-    <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
-        <!-- Tarjeta de clima -->
-    </div>
-</div>
-```
-
----
-
-## 🧩 Componentes Bootstrap Utilizados
-
-1. **Navbar** (`.navbar`, `.navbar-expand-lg`, `.navbar-brand`)
-   - Responsive con colapso en móvil
-   - Menú de navegación con enlaces
-
-2. **Grid System** (`.container-lg`, `.row`, `.col-*`)
-   - Layout responsivo de tarjetas
-   - Espaciado consistente con `g-4`
-
 ---
 
 ## 📊 Estructura del Proyecto
@@ -305,7 +208,7 @@ modulo3_portafolio/
 │   └── main.css            # CSS compilado (generado)
 ├── js/
 │   ├── app.js              # Lógica principal
-│   └── weatherService.js   # Servicio de datos
+│   └── weatherService.js   # Servicio de datos (API + Caché)
 └── assets/                 # Recursos adicionales
 ```
 
@@ -313,12 +216,12 @@ modulo3_portafolio/
 
 ## 🔮 Próximas Mejoras (Roadmap)
 
-- [ ] Integración con **Open-Meteo API** para datos en tiempo real
+- [x] Integración con **Open-Meteo API** para datos en tiempo real
+- [x] Gráficos de tendencia de temperatura (Chart.js)
+- [x] Sistema de Alertas Meteorológicas
 - [ ] Búsqueda de ubicaciones personalizadas
-- [ ] Gráficos de tendencia de temperatura
 - [ ] Modo oscuro/claro
 - [ ] PWA (Progressive Web App)
-- [ ] Notificaciones de alertas meteorológicas
 
 ---
 
@@ -332,7 +235,8 @@ modulo3_portafolio/
 2. `style: apply BEM methodology to weather cards and layout`
 3. `feat: integrate Bootstrap 4 grid and responsive design`
 4. `docs: add comprehensive README with methodology explanation`
-5. `refactor: modularize JavaScript into separate files`
+5. `feat: implement real-time data fetching from Open-Meteo API`
+6. `feat: add statistics dashboard and weather alerts`
 
 ### Convención de Commits
 
@@ -368,17 +272,7 @@ ISC License - Este proyecto es de uso educativo.
 - **BEM Methodology**: [https://getbem.com/](https://getbem.com/)
 - **SASS Documentation**: [https://sass-lang.com/](https://sass-lang.com/)
 - **Bootstrap 4 Docs**: [https://getbootstrap.com/docs/4.6/](https://getbootstrap.com/docs/4.6/)
-
----
-
-## 📸 Capturas de Pantalla
-
-*(Agregar capturas de pantalla aquí)*
-
-- Vista Home con grid de tarjetas
-- Vista de detalle de ubicación
-- Mapa interactivo
-- Responsive móvil
+- **Chart.js**: [https://www.chartjs.org/](https://www.chartjs.org/)
 
 ---
 
@@ -387,6 +281,7 @@ ISC License - Este proyecto es de uso educativo.
 - Datos meteorológicos de **Open-Meteo API**
 - Mapas proporcionados por **OpenStreetMap** y **Leaflet.js**
 - Iconos de **Font Awesome**
+- Gráficos por **Chart.js**
 
 ---
 

@@ -130,29 +130,26 @@
 
                 <!-- Stats & Alerts View (Initially Hidden) -->
                 <section id="stats" style="display:none;">
-                    <h2 class="page-title"><i class="fas fa-chart-line"></i> Análisis Regional</h2>
+                    <h2 class="page-title"><i class="fas fa-chart-line"></i> Pronóstico 7 Días</h2>
 
                     <!-- Alerts Container -->
-                    <div id="alertsContainer" class="mb-5">
+                    <div id="alertsContainer" class="mb-4">
                         <!-- Alerts will be injected here JS -->
                     </div>
 
-                    <!-- Charts Grid -->
-                    <div class="row">
-                        <div class="col-lg-6 mb-4">
-                            <div class="chart-container"
-                                style="background: white; padding: 1rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
-                                <h4 class="text-center mb-3 text-primary">Velocidad del Viento (km/h)</h4>
-                                <canvas id="windChart"></canvas>
-                            </div>
-                        </div>
-                        <div class="col-lg-6 mb-4">
-                            <div class="chart-container"
-                                style="background: white; padding: 1rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
-                                <h4 class="text-center mb-3 text-primary">Temperaturas Actuales (°C)</h4>
-                                <canvas id="tempChart"></canvas>
-                            </div>
-                        </div>
+                    <!-- City Selection Tabs -->
+                    <div class="city-tabs-container mb-4">
+                        <ul class="nav nav-pills flex-nowrap" id="cityTabs"
+                            style="overflow-x: auto; padding-bottom: 5px;">
+                            <!-- Tabs injected by JS -->
+                        </ul>
+                    </div>
+
+                    <!-- Chart Container -->
+                    <div class="chart-container"
+                        style="background: white; padding: 1rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                        <h4 class="text-center mb-3 text-primary" id="chartTitle">Temperaturas Máx/Mín</h4>
+                        <canvas id="forecastChart" height="300"></canvas>
                     </div>
 
                     <div class="text-center mt-4">
