@@ -17,6 +17,31 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Custom SASS Compiled CSS -->
     <link rel="stylesheet" href="css/main.css">
+    <style>
+        /* Custom Tab Styles */
+        .city-tabs-container .nav-pills .nav-link {
+            background-color: #f1f3f5;
+            color: #495057;
+            margin-right: 8px;
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border: 1px solid #dee2e6;
+        }
+
+        .city-tabs-container .nav-pills .nav-link:hover {
+            background-color: #e9ecef;
+            transform: translateY(-1px);
+        }
+
+        .city-tabs-container .nav-pills .nav-link.active {
+            background-color: #00bcd4;
+            color: white;
+            border-color: #00bcd4;
+            box-shadow: 0 2px 5px rgba(0, 188, 212, 0.3);
+        }
+    </style>
 </head>
 
 <body>

@@ -378,13 +378,22 @@ function renderForecastChart(city) {
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            layout: {
+                padding: {
+                    top: 20,
+                    bottom: 10,
+                    left: 10,
+                    right: 10
+                }
+            },
             plugins: {
                 legend: {
                     position: 'top',
+                    align: 'end',
                     labels: {
                         usePointStyle: true,
                         padding: 20,
-                        font: { size: 14 }
+                        font: { size: 12, family: "'Helvetica Neue', 'Helvetica', 'Arial', sans-serif" }
                     }
                 },
                 tooltip: {
@@ -394,17 +403,30 @@ function renderForecastChart(city) {
                     titleFont: { size: 14 },
                     bodyFont: { size: 13 },
                     padding: 10,
-                    cornerRadius: 8
+                    cornerRadius: 8,
+                    displayColors: true
                 }
             },
             scales: {
                 y: {
-                    grid: { color: '#f0f0f0' },
-                    ticks: { font: { size: 12 } }
+                    beginAtZero: false,
+                    grid: {
+                        color: '#e0e0e0',
+                        drawBorder: false
+                    },
+                    ticks: {
+                        font: { size: 12 },
+                        padding: 10,
+                        callback: function (value) { return value + '°C'; }
+                    },
+                    border: { display: false }
                 },
                 x: {
                     grid: { display: false },
-                    ticks: { font: { size: 12 } }
+                    ticks: {
+                        font: { size: 11 },
+                        maxRotation: 0
+                    }
                 }
             },
             interaction: {
