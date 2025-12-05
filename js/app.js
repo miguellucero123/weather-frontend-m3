@@ -702,6 +702,9 @@ async function renderTorresWeatherPoints() {
             addTorresMapMarker(pointData);
         });
 
+        // Render freezing level chart
+        renderFreezingLevelChart();
+
     } catch (error) {
         console.error('Error rendering Torres weather points:', error);
         container.innerHTML = '<div class="col-12"><div class="alert alert-danger">Error al cargar los datos.</div></div>';
@@ -799,4 +802,200 @@ function addTorresMapMarker(pointData) {
             <small>${pointData.description}</small>
         </div>
     `);
+}
+
+/**
+ * Render Freezing Level Chart with mountain silhouette
+ */
+function renderFreezingLevelChart() {
+    const ctx = document.getElementById('freezingLevelChart');
+    if (!ctx) return;
+
+    // Get average temperature from all Torres points
+    const avgTemp = torresWeatherData.reduce((sum, p) => sum + p.current.temperature_2m, 0) / torresWeatherData.length;
+
+    // Calculate freezing level (assuming base altitude of 100m for Torres del Paine)
+    const baseAltitude = 100;
+    const freezingLevel = weatherService.calculateFreezingLevel(avgTemp, baseAltitude);
+
+    // Mountain peaks in Torres del Paine (approximate heights in meters)
+    const mountains = [
+        { name: 'Paine Grande', height: 2884 },
+        { name: 'Torres del Paine', height: 2850 },
+        { name: 'Los Cuernos', height: 2600 },
+        { name: 'Almirante Nieto', height: 2670 },
+        { name: 'Fortaleza', height: 2800 }
+    ];
+
+    // Create mountain silhouette data
+    const mountainData = [];
+    const labels = [];
+
+    // Generate mountain profile
+    for (let i = 0; i <= 100; i++) {
+        const x = i;
+        labels.push(x);
+
+        // Create a mountain-like curve using sine waves
+        const height =
+            Math.sin(x * 0.15) * 800 +
+            Math.sin(x * 0.08) * 600 +
+            Math.sin(x * 0.25) * 400 +
+            1500;
+
+        mountainData.push(Math.max(baseAltitude, height));
+    }
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Perfil de Montaña',
+                    data: mountainData,
+                    backgroundColor: 'rgba(139, 115, 85, 0.7)',
+                    borderColor: 'rgba(101, 67, 33, 1)',
+                    borderWidth: 2,
+                    fill: 'origin',
+                    pointRadius: 0,
+                    tension: 0.4
+                },
+                {
+                    label: `Isoterma 0°C (${freezingLevel}m)`,
+                    data: Array(labels.length).fill(freezingLevel),
+                    borderColor: '#dc3545',
+                    backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                    borderWidth: 3,
+                    borderDash: [10, 5],
+                    fill: false,
+                    pointRadius: 0
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        font: { size: 12, weight: 'bold' },
+                        color: '#333',
+                        usePointStyle: true
+                    }
+                },
+                tooltip: {
+                    enabled: false
+                },
+                title: {
+                    display: true,
+                    text: `Temperatura actual: ${Math.round(avgTemp)}°C | Isoterma 0°C a ${freezingLevel}m`,
+                    font: { size: 14, weight: 'bold' },
+                    color: '#1e3c72'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 3000,
+                    title: {
+                        display: true,
+                        text: 'Altura (metros)',
+                        font: { size: 12, weight: 'bold' },
+                        color: '#333'
+                    },
+                    ticks: {
+                        callback: function (value) {
+                            return value + 'm';
+                        },
+                        font: { size: 11 },
+                        color: '#333'
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    }
+                },
+                x: {
+                    display: false
+                }
+            }
+        }
+    });
+}
+
+/**
+ * Enhanced render of Torres weather card with wind chill alert
+ */
+function renderTorresWeatherCard(pointData, container) {
+    const current = pointData.current;
+    const temp = Math.round(current.temperature_2m);
+    const feelsLike = Math.round(current.apparent_temperature);
+    const humidity = current.relative_humidity_2m;
+    const windSpeed = Math.round(current.wind_speed_10m);
+    const windDir = weatherService.getWindDirection(current.wind_direction_10m);
+    const precipitation = current.precipitation;
+    const weatherDesc = weatherService.getWeatherDescription(current.weather_code);
+    const weatherIcon = weatherService.getWeatherIcon(current.weather_code);
+
+    // Get wind chill severity
+    const windChillInfo = weatherService.getWindChillSeverity(feelsLike, temp);
+
+    // Determine if we should show wind chill alert
+    const showWindChillAlert = windChillInfo.level !== 'none';
+
+    const cardHtml = `
+        <div class="col-12 col-md-6 col-lg-4 mb-4">
+            <div class="card h-100" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: white; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+                <div class="card-body">
+                    <h5 class="card-title" style="border-bottom: 2px solid rgba(255,255,255,0.3); padding-bottom: 10px; margin-bottom: 15px;">
+                        <i class="fas ${pointData.icon}"></i> ${pointData.point}
+                    </h5>
+                    <p class="text-muted" style="font-size: 0.85rem; color: rgba(255,255,255,0.7) !important;">
+                        ${pointData.description}
+                    </p>
+                    
+                    ${showWindChillAlert ? `
+                    <div class="alert alert-${windChillInfo.class} mb-3" style="padding: 8px; font-size: 0.85rem; border-radius: 8px;">
+                        <i class="fas ${windChillInfo.icon}"></i> <strong>${windChillInfo.message}</strong>
+                    </div>
+                    ` : ''}
+                    
+                    <div class="text-center my-3">
+                        <i class="fas ${weatherIcon}" style="font-size: 3rem; color: #ffd700;"></i>
+                        <div style="font-size: 2.5rem; font-weight: bold; margin-top: 10px;">${temp}°C</div>
+                        <div style="font-size: 0.9rem; opacity: 0.8;">${weatherDesc}</div>
+                    </div>
+                    
+                    <div class="row text-center" style="border-top: 1px solid rgba(255,255,255,0.2); padding-top: 15px; margin-top: 15px;">
+                        <div class="col-6 mb-2">
+                            <small style="opacity: 0.8;">Sensación Térmica</small>
+                            <div style="font-weight: bold; font-size: 1.3rem; color: ${feelsLike < temp - 5 ? '#ff6b6b' : '#4ecdc4'};">
+                                ${feelsLike}°C
+                            </div>
+                            ${temp !== feelsLike ? `<small style="opacity: 0.7;">(${temp > feelsLike ? '-' : '+'}${Math.abs(temp - feelsLike)}°C)</small>` : ''}
+                        </div>
+                        <div class="col-6 mb-2">
+                            <small style="opacity: 0.8;">Humedad</small>
+                            <div style="font-weight: bold;">${humidity}%</div>
+                        </div>
+                        <div class="col-6">
+                            <small style="opacity: 0.8;">Viento</small>
+                            <div style="font-weight: bold;">${windSpeed} km/h ${windDir}</div>
+                        </div>
+                        <div class="col-6">
+                            <small style="opacity: 0.8;">Precipitación</small>
+                            <div style="font-weight: bold;">${precipitation} mm</div>
+                        </div>
+                    </div>
+                    <div class="mt-3" style="background: rgba(0,0,0,0.2); padding: 8px; border-radius: 8px; text-align: center;">
+                        <small><i class="fas fa-route"></i> Circuito ${pointData.circuit}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    container.insertAdjacentHTML('beforeend', cardHtml);
 }

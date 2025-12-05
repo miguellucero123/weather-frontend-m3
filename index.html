@@ -203,6 +203,23 @@
                         </div>
                     </div>
 
+                    <!-- Freezing Level Chart -->
+                    <div class="mb-4">
+                        <h3 class="text-center mb-3" style="color: #1e3c72;">
+                            <i class="fas fa-mountain"></i> Isoterma Cero (Altura de Congelación)
+                        </h3>
+                        <div class="chart-container"
+                            style="position: relative; height: 350px; background: linear-gradient(to bottom, #87CEEB 0%, #E0F6FF 50%, #8B7355 100%); padding: 1rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                            <canvas id="freezingLevelChart"></canvas>
+                        </div>
+                        <div class="text-center mt-2">
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle"></i> La línea roja indica la altura donde la temperatura
+                                es 0°C. Por encima de esta línea, espera nieve/hielo.
+                            </small>
+                        </div>
+                    </div>
+
                     <!-- Weather Points Grid -->
                     <div id="torresWeatherPoints" class="row">
                         <!-- Points will be injected by JS -->
@@ -253,9 +270,9 @@
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <!-- Weather Service (must load before app.js) -->
-    <script src="js/weatherService.js?v=4"></script>
+    <script src="js/weatherService.js?v=5"></script>
     <!-- Custom JavaScript -->
-    <script src="js/app.js?v=4"></script>
+    <script src="js/app.js?v=5"></script>
 </body>
 
 </html>

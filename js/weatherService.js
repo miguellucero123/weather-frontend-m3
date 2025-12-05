@@ -487,7 +487,80 @@ class WeatherService {
         const index = Math.round(degrees / 45) % 8;
         return directions[index];
     }
+
+    /**
+     * Calculate freezing level (isoterma cero) in meters
+     * Uses standard atmospheric lapse rate: -6.5°C per 1000m
+     * @param {number} tempAtSeaLevel - Temperature at sea level in °C
+     * @param {number} baseAltitude - Base altitude in meters (default 0)
+     * @returns {number} Height of 0°C isotherm in meters
+     */
+    calculateFreezingLevel(tempAtSeaLevel, baseAltitude = 0) {
+        const lapseRate = 6.5; // °C per 1000m
+
+        // If temperature is already below 0°C at base, freezing level is at or below base
+        if (tempAtSeaLevel <= 0) {
+            return baseAltitude;
+        }
+
+        // Calculate height where temperature reaches 0°C
+        const heightAboveBase = (tempAtSeaLevel / lapseRate) * 1000;
+        return Math.round(baseAltitude + heightAboveBase);
+    }
+
+    /**
+     * Get wind chill severity level
+     * @param {number} apparentTemp - Apparent temperature (feels like)
+     * @param {number} actualTemp - Actual temperature
+     * @returns {object} Severity info
+     */
+    getWindChillSeverity(apparentTemp, actualTemp) {
+        const difference = actualTemp - apparentTemp;
+
+        if (apparentTemp <= -20) {
+            return {
+                level: 'extreme',
+                color: '#8b0000',
+                icon: 'fa-skull-crossbones',
+                message: 'PELIGRO EXTREMO - Congelación en minutos',
+                class: 'danger'
+            };
+        } else if (apparentTemp <= -10) {
+            return {
+                level: 'severe',
+                color: '#dc3545',
+                icon: 'fa-exclamation-triangle',
+                message: 'Peligro Alto - Riesgo de hipotermia',
+                class: 'danger'
+            };
+        } else if (apparentTemp <= 0 || difference > 10) {
+            return {
+                level: 'moderate',
+                color: '#ffc107',
+                icon: 'fa-exclamation-circle',
+                message: 'Precaución - Viento frío significativo',
+                class: 'warning'
+            };
+        } else if (difference > 5) {
+            return {
+                level: 'low',
+                color: '#17a2b8',
+                icon: 'fa-info-circle',
+                message: 'Sensación de frío por viento',
+                class: 'info'
+            };
+        } else {
+            return {
+                level: 'none',
+                color: '#28a745',
+                icon: 'fa-check-circle',
+                message: 'Condiciones normales',
+                class: 'success'
+            };
+        }
+    }
 }
+
 
 
 // Export for use in other files
