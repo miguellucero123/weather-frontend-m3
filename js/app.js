@@ -381,7 +381,7 @@ function renderForecastChart(city) {
             layout: {
                 padding: {
                     top: 20,
-                    bottom: 10,
+                    bottom: 30, // Increased bottom padding for X-axis labels
                     left: 10,
                     right: 10
                 }
@@ -424,8 +424,9 @@ function renderForecastChart(city) {
                 x: {
                     grid: { display: false },
                     ticks: {
-                        font: { size: 11 },
-                        maxRotation: 0
+                        font: { size: 12 },
+                        maxRotation: 0,
+                        padding: 10 // Padding for X-axis labels
                     }
                 }
             },
