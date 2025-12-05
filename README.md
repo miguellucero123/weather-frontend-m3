@@ -252,7 +252,7 @@ Siguiendo **Conventional Commits**:
 
 ## 👤 Autor
 
-**Nombre**: [Tu Nombre]  
+**Nombre**: Miguel Lucero  
 **Curso**: Desarrollo Frontend - Módulo 3  
 **Institución**: AIEP  
 **Año**: 2025
