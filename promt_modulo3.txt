@@ -1,0 +1,98 @@
+1) Propósito
+Refactorizar la interfaz de la aplicación de clima desarrollada en el Módulo 2, aplicando metodologías
+de organización de estilos, preprocesamiento con SASS y el modelo de cajas para construir un
+layout más claro, mantenible y responsivo.
+El foco de esta iteración no es agregar nuevas funcionalidades complejas, sino mejorar la
+experiencia visual y la calidad del CSS. Mantén la temática que elegiste, pero ten en cuenta que
+posteriormente deberás conectar la aplicación con una API, por lo que ahora es el momento de
+redirigir el rumbo de tu proyecto.
+
+2) Objetivos de aprendizaje
+• Describir y aplicar una metodología de organización de estilos (por ejemplo, BEM) en una
+interfaz web.
+• Utilizar SASS para modularizar y reutilizar código CSS (variables, parciales, mixins,
+anidamiento).
+• Implementar el modelo de cajas y conceptos de layout (posicionamiento, tipos de layout) en la
+App de Clima.
+• Utilizar Bootstrap 4 para simplificar el desarrollo de layouts, contenidos y componentes.
+• Gestionar el proyecto con Git/GitHub (commits descriptivos, trabajo incremental, README
+actualizado).
+
+3) Alcance (MVP)
+Se trabaja sobre la misma estructura base de la app del Módulo 2:
+• Inicio (Home): grilla de lugares con cards que muestran el clima actual.
+• Detalle de lugar: vista con información ampliada del lugar seleccionado.
+En esta entrega se espera:
+• Mantener la misma funcionalidad mínima lograda en Módulo 2.
+• Rediseñar la interfaz para que:
+o Tenga una estructura clara (header/nav, contenido principal, footer).
+o Organice las cards de lugares en un layout responsivo y ordenado.
+o Utilice una guía de estilos mínima (colores, tipografía, tamaños) aplicada de
+forma consistente.
+
+4) Requisitos funcionales mínimos
+• La app debe seguir mostrando:
+o Un listado de lugares en Home mediante cards con información de clima
+(icono, temperatura, estado, etc.).
+o Una vista de detalle para un lugar seleccionado.
+• La interfaz debe:
+o Incluir un header o navbar consistente (con el nombre de la app y enlaces
+principales).
+o Incluir un footer con información básica del proyecto (autor, año, breve
+descripción).
+o Organizar el contenido principal en secciones reconocibles (por ejemplo, zona
+de búsqueda, zona de resultados).
+
+• Responsividad:
+o En pantallas pequeñas (≤ 420 px): las cards de lugares se muestran apiladas en
+una sola columna.
+o En pantallas grandes (≥ 1024 px): se muestran varias cards por fila, con
+espaciado y alineación coherentes.
+
+5) Requisitos técnicos
+Metodología de estilos
+• Aplicar una metodología para la organización de estilos, recomendadamente BEM.
+• Utilizar nombres de clases acordes a la metodología, por ejemplo:
+o .weather-app, .weather-app__header, .weather-app__content
+o .place-card, .place-card__name, .place-card__temp, .place-card--sunny, .place-card--
+rainy
+SASS y modularización
+• Crear una estructura básica de SASS, por ejemplo:
+/scss
+/base/_variables.scss
+/layout/_layout.scss
+/components/_place-card.scss
+main.scss
+• En main.scss importar los parciales (@import 'base/variables';, etc.).
+• Utilizar al menos:
+o Variables: para colores, tipografías, tamaños y/o espaciados.
+o Anidamiento: para agrupar estilos de un mismo bloque (por ejemplo, .place-card { ...
+&__name { ... } }).
+o Un mixin simple (por ejemplo, para aplicar un estilo repetido a varias cards o botones).
+• Compilar SASS a un archivo CSS final (por ejemplo, css/main.css o dist/css/main.css) y
+enlazarlo en el HTML.
+Bootstrap 4 (o 5 si lo deseas)
+• Utilizar el sistema de grid de Bootstrap para organizar las cards de lugares:
+o Ejemplo: col-12 en móvil, col-md-6, col-lg-4 en pantallas más grandes.
+• Utilizar al menos dos componentes de Bootstrap, por ejemplo:
+o Navbar, cards, botones, formularios, breadcrumb, etc.
+• Incluir Bootstrap 4 vía CDN (CSS y JS).
+Git/GitHub
+• Crear un repositorio público para esta entrega (por ejemplo: weather-frontend-m3) o
+continuar el del Módulo 2 con una rama o versión clara.
+• Realizar mínimo 3 commits con mensajes descriptivos que reflejen el progreso (ej.:
+chore: configurar estructura sass, style: aplicar BEM a cards de lugares, layout: mejorar
+grid en home).
+• Mantener el README.md actualizado para esta iteración.
+
+6) Entregables
+• Proyecto comprimido en un único archivo .zip que contenga:
+o Archivos HTML.
+o Carpeta de SASS (/scss) y CSS compilado (/css o /dist/css).
+o Carpeta de recursos (imágenes, íconos, etc.), si corresponde.
+• Archivo README.md con:
+o Descripción breve de la App de Clima y su temática (qué tipo de lugares
+maneja).
+o Indicación de la metodología de estilos utilizada (BEM/OOCSS/SMACSS).
+o Breve explicación de la estructura SASS (parciales principales y qué agrupan).
+o Enlace al repositorio público de GitHub del proyecto.

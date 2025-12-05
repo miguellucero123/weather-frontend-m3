@@ -17,6 +17,59 @@ const CITIES = {
     "Tres Lagos": { lat: -50.2833, lon: -72.7, distance: 400, zone: "Zona Centro" }
 };
 
+// Torres del Paine Internal Points (Circuit W and O)
+const TORRES_POINTS = {
+    "Base Torres": {
+        lat: -50.9417, lon: -72.9667,
+        icon: "fa-mountain",
+        description: "Mirador Base Torres - Punto más emblemático",
+        circuit: "W"
+    },
+    "Glaciar Grey": {
+        lat: -51.0, lon: -73.23,
+        icon: "fa-snowflake",
+        description: "Refugio Glaciar Grey - Zona occidental",
+        circuit: "W"
+    },
+    "Valle del Francés": {
+        lat: -50.9667, lon: -73.0833,
+        icon: "fa-tree",
+        description: "Mirador Valle del Francés - Centro del circuito",
+        circuit: "W"
+    },
+    "Refugio Paine Grande": {
+        lat: -50.9500, lon: -73.1167,
+        icon: "fa-house",
+        description: "Refugio principal - Lago Pehoé",
+        circuit: "W"
+    },
+    "Campamento Italiano": {
+        lat: -50.9583, lon: -73.0667,
+        icon: "fa-campground",
+        description: "Campamento Italiano - Acceso Valle Francés",
+        circuit: "W"
+    },
+    "Mirador Los Cuernos": {
+        lat: -50.9333, lon: -73.0167,
+        icon: "fa-binoculars",
+        description: "Vista panorámica de Los Cuernos",
+        circuit: "W"
+    },
+    "Administración": {
+        lat: -50.9417, lon: -72.9667,
+        icon: "fa-building",
+        description: "Centro de administración del parque",
+        circuit: "O"
+    },
+    "Lago Pehoé": {
+        lat: -50.9500, lon: -73.1000,
+        icon: "fa-water",
+        description: "Lago Pehoé - Vista icónica",
+        circuit: "O"
+    }
+};
+
+
 class WeatherService {
     constructor() {
         this.apiBaseUrl = 'https://api.open-meteo.com/v1/forecast';
@@ -365,7 +418,77 @@ class WeatherService {
         if (code >= 71 && code <= 86) return 'snowy';
         return 'cloudy';
     }
+
+    /**
+     * Get all Torres del Paine internal points
+     */
+    getTorresPoints() {
+        return TORRES_POINTS;
+    }
+
+    /**
+     * Fetch weather data for a specific Torres point
+     */
+    async fetchTorresPointWeather(pointName, coords) {
+        const params = new URLSearchParams({
+            latitude: coords.lat,
+            longitude: coords.lon,
+            current: 'temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,wind_direction_10m',
+            hourly: 'temperature_2m,precipitation,wind_speed_10m,wind_direction_10m',
+            daily: 'temperature_2m_max,temperature_2m_min,precipitation_sum,wind_speed_10m_max',
+            timezone: 'America/Santiago',
+            forecast_days: 7
+        });
+
+        try {
+            const response = await fetch(`${this.apiBaseUrl}?${params}`);
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+            const data = await response.json();
+
+            return {
+                point: pointName,
+                coords: coords,
+                icon: coords.icon,
+                description: coords.description,
+                circuit: coords.circuit,
+                current: data.current,
+                hourly: data.hourly,
+                daily: data.daily
+            };
+        } catch (error) {
+            console.error(`Error fetching weather for ${pointName}:`, error);
+            return null;
+        }
+    }
+
+    /**
+     * Fetch weather for all Torres points
+     */
+    async fetchAllTorresPoints() {
+        const promises = Object.entries(TORRES_POINTS).map(([pointName, coords]) =>
+            this.fetchTorresPointWeather(pointName, coords)
+        );
+
+        try {
+            const results = await Promise.all(promises);
+            return results.filter(r => r !== null);
+        } catch (error) {
+            console.error('Error fetching Torres points weather:', error);
+            return [];
+        }
+    }
+
+    /**
+     * Calculate wind direction name from degrees
+     */
+    getWindDirection(degrees) {
+        const directions = ['N', 'NE', 'E', 'SE', 'S', 'SO', 'O', 'NO'];
+        const index = Math.round(degrees / 45) % 8;
+        return directions[index];
+    }
 }
+
 
 // Export for use in other files
 if (typeof module !== 'undefined' && module.exports) {

@@ -76,6 +76,11 @@
                                     <i class="fas fa-chart-bar"></i> Estadísticas
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link navbar__link" href="#" onclick="showTorresDetail()">
+                                    <i class="fas fa-mountain"></i> Torres del Paine
+                                </a>
+                            </li>
                         </ul>
                     </div>
                 </div>
@@ -185,6 +190,31 @@
                     </div>
                 </section>
 
+                <!-- Torres del Paine Detailed View (Initially Hidden) -->
+                <section id="torres-paine" style="display:none;">
+                    <h2 class="page-title">
+                        <i class="fas fa-mountain"></i> Torres del Paine - Pronóstico Detallado
+                    </h2>
+                    <p class="section-subtitle">Condiciones meteorológicas en puntos clave del Circuito W y O</p>
+
+                    <!-- Torres Map Container -->
+                    <div class="torres-map-section mb-4">
+                        <div id="torresMapContainer" style="height: 400px; border-radius: 12px; overflow: hidden;">
+                        </div>
+                    </div>
+
+                    <!-- Weather Points Grid -->
+                    <div id="torresWeatherPoints" class="row">
+                        <!-- Points will be injected by JS -->
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <button class="btn btn-custom" onclick="goHome()">
+                            <i class="fas fa-arrow-left"></i> Volver al Inicio
+                        </button>
+                    </div>
+                </section>
+
                 <!-- Detail View (Initially Hidden) -->
                 <section id="detail" style="display:none;">
                     <a href="#" onclick="goHome(); return false;" class="btn btn-custom btn--back">
@@ -223,9 +253,9 @@
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <!-- Weather Service (must load before app.js) -->
-    <script src="js/weatherService.js?v=3"></script>
+    <script src="js/weatherService.js?v=4"></script>
     <!-- Custom JavaScript -->
-    <script src="js/app.js?v=3"></script>
+    <script src="js/app.js?v=4"></script>
 </body>
 
 </html>

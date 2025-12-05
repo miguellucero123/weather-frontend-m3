@@ -16,6 +16,11 @@ const TORRES_DEL_PAINE = [-51.0000, -73.2300];
 let forecastChart = null;
 let currentStatsCity = null;
 
+// Torres del Paine detailed map variables
+let torresMap = null;
+let torresMapInitialized = false;
+let torresWeatherData = [];
+
 /**
  * Initialize app on DOM ready
  */
@@ -251,6 +256,7 @@ function goHome() {
     document.getElementById('home').style.display = 'block';
     document.getElementById('detail').style.display = 'none';
     document.getElementById('stats').style.display = 'none';
+    document.getElementById('torres-paine').style.display = 'none';
 
     document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
     document.querySelector('a[onclick="goHome()"]').classList.add('active');
@@ -265,6 +271,7 @@ function showStats() {
     document.getElementById('home').style.display = 'none';
     document.getElementById('detail').style.display = 'none';
     document.getElementById('stats').style.display = 'block';
+    document.getElementById('torres-paine').style.display = 'none';
 
     document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
     document.querySelector('a[onclick="showStats()"]').classList.add('active');
@@ -621,4 +628,175 @@ function showDayDetail(city, dayIndex) {
         behavior: 'smooth',
         block: 'start'
     });
+}
+
+/**
+ * Show Torres del Paine Detailed View
+ */
+async function showTorresDetail() {
+    document.getElementById('home').style.display = 'none';
+    document.getElementById('detail').style.display = 'none';
+    document.getElementById('stats').style.display = 'none';
+    document.getElementById('torres-paine').style.display = 'block';
+
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    document.querySelector('a[onclick="showTorresDetail()"]').classList.add('active');
+
+    // Initialize map if not already done
+    if (!torresMapInitialized) {
+        initializeTorresMap();
+        torresMapInitialized = true;
+    }
+
+    // Fetch and render weather data for Torres points
+    await renderTorresWeatherPoints();
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/**
+ * Initialize Torres del Paine detailed map
+ */
+function initializeTorresMap() {
+    torresMap = L.map('torresMapContainer').setView([-50.95, -73.05], 11);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(torresMap);
+
+    setTimeout(() => {
+        torresMap.invalidateSize();
+    }, 100);
+}
+
+/**
+ * Render weather points for Torres del Paine
+ */
+async function renderTorresWeatherPoints() {
+    const container = document.getElementById('torresWeatherPoints');
+    container.innerHTML = '<div class="col-12 text-center"><i class="fas fa-spinner fa-spin fa-2x"></i><p>Cargando datos meteorológicos...</p></div>';
+
+    try {
+        torresWeatherData = await weatherService.fetchAllTorresPoints();
+
+        if (torresWeatherData.length === 0) {
+            container.innerHTML = '<div class="col-12"><div class="alert alert-warning">No se pudieron cargar los datos meteorológicos.</div></div>';
+            return;
+        }
+
+        // Clear loading message
+        container.innerHTML = '';
+
+        // Clear existing markers
+        if (torresMap) {
+            torresMap.eachLayer((layer) => {
+                if (layer instanceof L.Marker || layer instanceof L.CircleMarker) {
+                    torresMap.removeLayer(layer);
+                }
+            });
+        }
+
+        // Render each point
+        torresWeatherData.forEach(pointData => {
+            renderTorresWeatherCard(pointData, container);
+            addTorresMapMarker(pointData);
+        });
+
+    } catch (error) {
+        console.error('Error rendering Torres weather points:', error);
+        container.innerHTML = '<div class="col-12"><div class="alert alert-danger">Error al cargar los datos.</div></div>';
+    }
+}
+
+/**
+ * Render a weather card for a Torres point
+ */
+function renderTorresWeatherCard(pointData, container) {
+    const current = pointData.current;
+    const temp = Math.round(current.temperature_2m);
+    const feelsLike = Math.round(current.apparent_temperature);
+    const humidity = current.relative_humidity_2m;
+    const windSpeed = Math.round(current.wind_speed_10m);
+    const windDir = weatherService.getWindDirection(current.wind_direction_10m);
+    const precipitation = current.precipitation;
+    const weatherDesc = weatherService.getWeatherDescription(current.weather_code);
+    const weatherIcon = weatherService.getWeatherIcon(current.weather_code);
+
+    const cardHtml = `
+        <div class="col-12 col-md-6 col-lg-4 mb-4">
+            <div class="card h-100" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: white; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+                <div class="card-body">
+                    <h5 class="card-title" style="border-bottom: 2px solid rgba(255,255,255,0.3); padding-bottom: 10px; margin-bottom: 15px;">
+                        <i class="fas ${pointData.icon}"></i> ${pointData.point}
+                    </h5>
+                    <p class="text-muted" style="font-size: 0.85rem; color: rgba(255,255,255,0.7) !important;">
+                        ${pointData.description}
+                    </p>
+                    <div class="text-center my-3">
+                        <i class="fas ${weatherIcon}" style="font-size: 3rem; color: #ffd700;"></i>
+                        <div style="font-size: 2.5rem; font-weight: bold; margin-top: 10px;">${temp}°C</div>
+                        <div style="font-size: 0.9rem; opacity: 0.8;">${weatherDesc}</div>
+                    </div>
+                    <div class="row text-center" style="border-top: 1px solid rgba(255,255,255,0.2); padding-top: 15px; margin-top: 15px;">
+                        <div class="col-6 mb-2">
+                            <small style="opacity: 0.8;">Sensación</small>
+                            <div style="font-weight: bold;">${feelsLike}°C</div>
+                        </div>
+                        <div class="col-6 mb-2">
+                            <small style="opacity: 0.8;">Humedad</small>
+                            <div style="font-weight: bold;">${humidity}%</div>
+                        </div>
+                        <div class="col-6">
+                            <small style="opacity: 0.8;">Viento</small>
+                            <div style="font-weight: bold;">${windSpeed} km/h ${windDir}</div>
+                        </div>
+                        <div class="col-6">
+                            <small style="opacity: 0.8;">Precipitación</small>
+                            <div style="font-weight: bold;">${precipitation} mm</div>
+                        </div>
+                    </div>
+                    <div class="mt-3" style="background: rgba(0,0,0,0.2); padding: 8px; border-radius: 8px; text-align: center;">
+                        <small><i class="fas fa-route"></i> Circuito ${pointData.circuit}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    container.insertAdjacentHTML('beforeend', cardHtml);
+}
+
+/**
+ * Add marker to Torres map
+ */
+function addTorresMapMarker(pointData) {
+    if (!torresMap) return;
+
+    const temp = Math.round(pointData.current.temperature_2m);
+    const lat = pointData.coords.lat;
+    const lon = pointData.coords.lon;
+
+    // Color based on temperature
+    let color;
+    if (temp < 0) color = '#0d47a1';
+    else if (temp < 5) color = '#1976d2';
+    else if (temp < 10) color = '#00bcd4';
+    else if (temp < 15) color = '#4caf50';
+    else color = '#ff9800';
+
+    const marker = L.circleMarker([lat, lon], {
+        radius: 8,
+        fillColor: color,
+        color: '#fff',
+        weight: 2,
+        fillOpacity: 0.9
+    }).addTo(torresMap);
+
+    marker.bindPopup(`
+        <div style="text-align: center;">
+            <strong><i class="fas ${pointData.icon}"></i> ${pointData.point}</strong><br>
+            <span style="font-size: 1.2rem; font-weight: bold;">${temp}°C</span><br>
+            <small>${pointData.description}</small>
+        </div>
+    `);
 }
