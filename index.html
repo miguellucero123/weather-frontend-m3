@@ -56,30 +56,35 @@
                     <a class="navbar-brand navbar__brand" href="#">
                         <i class="fas fa-cloud-sun"></i>ClimaTorre
                     </a>
-                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-label="Toggle navigation">
                         <span class="navbar-toggler-icon"></span>
                     </button>
                     <div class="collapse navbar-collapse" id="navbarNav">
                         <ul class="navbar-nav ml-auto">
                             <li class="nav-item">
-                                <a class="nav-link navbar__link active" href="#" onclick="goHome()">
+                                <a class="nav-link navbar__link active" href="#" data-nav="home">
                                     <i class="fas fa-home"></i> Inicio
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link navbar__link" href="#" onclick="scrollToMap()">
+                                <a class="nav-link navbar__link" href="#" data-nav="map">
                                     <i class="fas fa-map"></i> Mapa
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link navbar__link" href="#" onclick="showStats()">
+                                <a class="nav-link navbar__link" href="#" data-nav="stats">
                                     <i class="fas fa-chart-bar"></i> Estadísticas
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link navbar__link" href="#" onclick="showTorresDetail()">
+                                <a class="nav-link navbar__link" href="#" data-nav="torres">
                                     <i class="fas fa-mountain"></i> Torres del Paine
                                 </a>
+                            </li>
+                            <li class="nav-item">
+                                <button class="btn btn-sm theme-toggle" id="themeToggle" type="button" title="Cambiar tema" aria-label="Cambiar entre tema claro y oscuro">
+                                    <i class="fas fa-moon" id="themeIcon" aria-hidden="true"></i>
+                                </button>
                             </li>
                         </ul>
                     </div>
@@ -151,7 +156,7 @@
 
                     <!-- Map Section -->
                     <div id="mapa" class="map-section">
-                        <div class="map-header" onclick="toggleMap()">
+                        <div class="map-header" data-toggle="map">
                             <h3><i class="fas fa-map"></i> Mapa Interactivo</h3>
                             <span class="map-toggle"><i class="fas fa-chevron-down"></i></span>
                         </div>
@@ -170,21 +175,19 @@
 
                     <!-- City Selection Tabs -->
                     <div class="city-tabs-container mb-4">
-                        <ul class="nav nav-pills flex-nowrap" id="cityTabs"
-                            style="overflow-x: auto; padding-bottom: 5px;">
+                        <ul class="nav nav-pills flex-nowrap" id="cityTabs">
                             <!-- Tabs injected by JS -->
                         </ul>
                     </div>
 
                     <!-- Chart Container -->
-                    <div class="chart-container"
-                        style="position: relative; height: 50vh; min-height: 300px; background: white; padding: 1rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                    <div class="chart-container">
                         <h4 class="text-center mb-3 text-primary" id="chartTitle">Temperaturas Máx/Mín</h4>
                         <canvas id="forecastChart"></canvas>
                     </div>
 
                     <div class="text-center mt-4">
-                        <button class="btn btn-custom" onclick="goHome()">
+                        <button class="btn btn-custom" type="button" data-action="go-home">
                             <i class="fas fa-arrow-left"></i> Volver al Inicio
                         </button>
                     </div>
@@ -199,17 +202,16 @@
 
                     <!-- Torres Map Container -->
                     <div class="torres-map-section mb-4">
-                        <div id="torresMapContainer" style="height: 400px; border-radius: 12px; overflow: hidden;">
+                        <div id="torresMapContainer" class="torres-map-container">
                         </div>
                     </div>
 
                     <!-- Freezing Level Chart -->
                     <div class="mb-4">
-                        <h3 class="text-center mb-3" style="color: #1e3c72;">
+                        <h3 class="text-center mb-3 freezing-chart-title">
                             <i class="fas fa-mountain"></i> Isoterma Cero (Altura de Congelación)
                         </h3>
-                        <div class="chart-container"
-                            style="position: relative; height: 350px; background: linear-gradient(to bottom, #87CEEB 0%, #E0F6FF 50%, #8B7355 100%); padding: 1rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                        <div class="chart-container freezing-level-chart">
                             <canvas id="freezingLevelChart"></canvas>
                         </div>
                         <div class="text-center mt-2">
@@ -221,12 +223,12 @@
                     </div>
 
                     <!-- Weather Points Grid -->
-                    <div id="torresWeatherPoints" class="row">
+                    <div id="torresWeatherPoints" class="row g-4">
                         <!-- Points will be injected by JS -->
                     </div>
 
                     <div class="text-center mt-4">
-                        <button class="btn btn-custom" onclick="goHome()">
+                        <button class="btn btn-custom" type="button" data-action="go-home">
                             <i class="fas fa-arrow-left"></i> Volver al Inicio
                         </button>
                     </div>
@@ -234,7 +236,7 @@
 
                 <!-- Detail View (Initially Hidden) -->
                 <section id="detail" style="display:none;">
-                    <a href="#" onclick="goHome(); return false;" class="btn btn-custom btn--back">
+                    <a href="#" class="btn btn-custom btn--back" data-action="go-home">
                         <i class="fas fa-arrow-left"></i> Volver
                     </a>
                     <div id="detailContent"></div>
@@ -271,6 +273,33 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <!-- Weather Service (must load before app.js) -->
     <script src="js/weatherService.js?v=5"></script>
+    
+    <!-- Theme Manager (must load early) -->
+    <script src="js/theme.js"></script>
+    
+    <!-- Navigation Event Handlers (must load before app.js) -->
+    <script src="js/navigation.js"></script>
+
+    <!-- Utilidades para excursionistas -->
+    <script src="js/utils/excursionista.js"></script>
+
+    <!-- ============================================ -->
+    <!-- Módulo 4: Datos estáticos de lugares -->
+    <!-- ============================================ -->
+    <script src="js/lugares.js"></script>
+    
+    <!-- ============================================ -->
+    <!-- OPCIONAL: Servicios mejorados (Senior Dev) -->
+    <!-- Descomentar para usar arquitectura modular -->
+    <!-- ============================================ -->
+    <!--
+    <script src="js/config/constants.js"></script>
+    <script src="js/utils/validators.js"></script>
+    <script src="js/utils/mathUtils.js"></script>
+    <script src="js/services/LugarService.js"></script>
+    <script src="js/services/EstadisticasService.js"></script>
+    -->
+    
     <!-- Custom JavaScript -->
     <script src="js/app.js?v=5"></script>
 </body>

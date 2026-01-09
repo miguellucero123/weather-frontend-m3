@@ -3,3 +3,8 @@ node_modules/
 *.log
 .vscode/
 .idea/
+*.map
+.env
+.env.local
+dist/
+build/

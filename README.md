@@ -1,8 +1,14 @@
 # ClimaTorre - Torres del Paine Weather App
 
-**Módulo 3 - Portafolio de Desarrollo Frontend**
+**Módulo 4 - Portafolio de Desarrollo Frontend**
 
 Aplicación web de pronóstico meteorológico para Torres del Paine y áreas circundantes de la Patagonia chilena y argentina.
+
+[![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white)](https://developer.mozilla.org/es/docs/Web/HTML)
+[![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=white)](https://developer.mozilla.org/es/docs/Web/CSS)
+[![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black)](https://developer.mozilla.org/es/docs/Web/JavaScript)
+[![Bootstrap](https://img.shields.io/badge/Bootstrap-7952B3?style=flat&logo=bootstrap&logoColor=white)](https://getbootstrap.com/)
+[![SASS](https://img.shields.io/badge/SASS-CC6699?style=flat&logo=sass&logoColor=white)](https://sass-lang.com/)
 
 ---
 
@@ -45,10 +51,16 @@ Esta versión incluye características avanzadas que llevan el proyecto al sigui
 
 ---
 
-## 🎯 Objetivos de Aprendizaje (Módulo 3)
+## 🎯 Objetivos de Aprendizaje
 
-Esta iteración del proyecto se enfoca en:
+### Módulo 2
+- ✅ HTML5 semántico y estructura limpia
+- ✅ Bootstrap para diseño responsive
+- ✅ JavaScript básico con DOM manipulation
+- ✅ Uso de `addEventListener` para navegación (sin `onclick` inline)
+- ✅ Modificación dinámica de clases CSS según ubicación
 
+### Módulo 3
 1. ✅ **Metodología de organización de estilos (BEM)**
 2. ✅ **Preprocesamiento con SASS** (variables, mixins, parciales, anidamiento)
 3. ✅ **Modelo de cajas y conceptos de layout** (posicionamiento, flexbox, grid)
@@ -56,6 +68,16 @@ Esta iteración del proyecto se enfoca en:
 5. ✅ **Gestión Git/GitHub** con commits descriptivos
 6. ✅ **Consumo de APIs REST** y manejo de asincronía (Async/Await)
 7. ✅ **Visualización de Datos** con librerías de terceros (Chart.js)
+
+### Módulo 4
+1. ✅ **Modelado de datos**: Arreglo de lugares con estructura completa
+2. ✅ **Variables y constantes**: Uso para cálculos intermedios
+3. ✅ **Ciclos (for/while)**: Recorrido de pronóstico semanal
+4. ✅ **Condicionales (if/else)**: Evaluación de estados y generación de resúmenes
+5. ✅ **Funciones**: `buscarLugar()` y `calcularEstadisticas()`
+6. ✅ **Cálculos estadísticos**: Mínimo, máximo, promedio de temperaturas
+7. ✅ **Conteo de días**: Por tipo de clima (Soleado, Nublado, Lluvioso)
+8. ✅ **Resumen textual**: Generación automática basada en condiciones
 
 ---
 
@@ -195,20 +217,36 @@ Luego navega a `http://localhost:8000`
 ## 📊 Estructura del Proyecto
 
 ```
-modulo3_portafolio/
-├── index.html              # Página principal
+modulo4_portafolio/
+├── index.html              # Página principal (HTML5 semántico)
 ├── package.json            # Configuración npm
 ├── README.md               # Este archivo
+├── CHANGELOG.md            # Historial de cambios
 ├── scss/                   # Código fuente SASS
 │   ├── base/
+│   │   ├── _variables.scss    # Variables de diseño
+│   │   ├── _mixins.scss        # Mixins reutilizables
+│   │   └── _reset.scss         # Reset CSS
 │   ├── layout/
+│   │   └── _layout.scss        # Estructura principal
 │   ├── components/
-│   └── main.scss
+│   │   ├── _navbar.scss        # Barra de navegación
+│   │   ├── _place-card.scss    # Tarjetas de ubicaciones
+│   │   ├── _buttons.scss       # Botones
+│   │   ├── _footer.scss        # Pie de página
+│   │   ├── _theme.scss         # Estilos de tema claro/oscuro
+│   │   └── _inline-styles.scss # Estilos movidos desde HTML
+│   └── main.scss               # Archivo principal
 ├── css/
 │   └── main.css            # CSS compilado (generado)
 ├── js/
 │   ├── app.js              # Lógica principal
-│   └── weatherService.js   # Servicio de datos (API + Caché)
+│   ├── navigation.js       # Event listeners de navegación
+│   ├── theme.js            # Gestor de tema claro/oscuro
+│   ├── weatherService.js   # Servicio de datos (API + Caché)
+│   ├── lugares.js          # Datos estáticos Módulo 4
+│   └── utils/
+│       └── excursionista.js # Utilidades para excursionistas
 └── assets/                 # Recursos adicionales
 ```
 
@@ -219,9 +257,12 @@ modulo3_portafolio/
 - [x] Integración con **Open-Meteo API** para datos en tiempo real
 - [x] Gráficos de tendencia de temperatura (Chart.js)
 - [x] Sistema de Alertas Meteorológicas
+- [x] Modo oscuro/claro
+- [x] Variables meteorológicas para excursionistas
+- [x] Reestructuración de código (scripts externos)
 - [ ] Búsqueda de ubicaciones personalizadas
-- [ ] Modo oscuro/claro
 - [ ] PWA (Progressive Web App)
+- [ ] Notificaciones push para alertas críticas
 
 ---
 
@@ -229,14 +270,23 @@ modulo3_portafolio/
 
 ### Commits Realizados
 
-✅ **Mínimo 3 commits descriptivos:**
+✅ **Commits descriptivos siguiendo Conventional Commits:**
 
+#### Módulo 3
 1. `chore: setup sass structure and npm configuration`
 2. `style: apply BEM methodology to weather cards and layout`
 3. `feat: integrate Bootstrap 4 grid and responsive design`
 4. `docs: add comprehensive README with methodology explanation`
 5. `feat: implement real-time data fetching from Open-Meteo API`
 6. `feat: add statistics dashboard and weather alerts`
+
+#### Módulo 4
+7. `feat: add dark/light theme toggle with persistence`
+8. `refactor: move all scripts to external files (separation of concerns)`
+9. `feat: add excursionist-focused weather variables to Torres cards`
+10. `fix: ensure uniform card heights in grid layout`
+11. `feat: implement Module 4 requirements (data modeling, statistics)`
+12. `docs: update README and add CHANGELOG`
 
 ### Convención de Commits
 
@@ -252,8 +302,8 @@ Siguiendo **Conventional Commits**:
 
 ## 👤 Autor
 
-**Nombre**: Miguel Lucero  
-**Curso**: Desarrollo Frontend - Módulo 3  
+**Nombre**: [Tu Nombre]  
+**Curso**: Desarrollo Frontend - Módulo 4  
 **Institución**: AIEP  
 **Año**: 2025
 

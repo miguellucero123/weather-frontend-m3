@@ -67,6 +67,8 @@ function updateUI(timestamp) {
 
 /**
  * Render weather cards dynamically
+ * Muestra las ciudades de la región (datos de API)
+ * Implementa patrón del Módulo 2: addEventListener para navegación
  */
 function renderWeatherCards() {
     const gridContainer = document.querySelector('.row.g-4');
@@ -89,7 +91,7 @@ function renderWeatherCards() {
 
         const cardHtml = `
             <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
-                <article class="place-card place-card--${modifier}" onclick="showDetail('${cityName}')">
+                <article class="place-card place-card--${modifier}" data-city="${cityName}">
                     <div class="place-card__header">
                         <h2 class="place-card__name">${cityName}</h2>
                         <span class="place-card__distance">${data.city.distance} km</span>
@@ -107,6 +109,26 @@ function renderWeatherCards() {
         `;
 
         gridContainer.insertAdjacentHTML('beforeend', cardHtml);
+    });
+
+    // Implementar navegación con addEventListener (Requisito Módulo 2)
+    setupCardNavigation();
+}
+
+/**
+ * Configurar navegación desde cards usando addEventListener
+ * Cumple con requisito del Módulo 2: Ejemplo de uso de JS 1
+ */
+function setupCardNavigation() {
+    const cardLinks = document.querySelectorAll('.place-card[data-city]');
+    
+    cardLinks.forEach(function (card) {
+        card.addEventListener('click', function () {
+            const cityName = this.getAttribute('data-city');
+            if (cityName) {
+                showDetail(cityName);
+            }
+        });
     });
 }
 
@@ -137,8 +159,10 @@ function updateLastUpdatedInfo(date) {
 
 /**
  * Setup navigation events
+ * Implementa patrón del Módulo 2: Modificando clases dependiendo de la ubicación
  */
 function setupNavigation() {
+    // Navegación con anclas
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
             const href = this.getAttribute('href');
@@ -151,6 +175,50 @@ function setupNavigation() {
             }
         });
     });
+
+    // Modificar clases de navegación según ubicación (Requisito Módulo 2: Ejemplo de uso de JS 2)
+    updateActiveNavLinks();
+}
+
+/**
+ * Actualizar clases activas de navegación según la vista actual
+ * Cumple con requisito del Módulo 2: Ejemplo de uso de JS 2
+ */
+function updateActiveNavLinks() {
+    const links = document.querySelectorAll('.nav-link');
+    const currentView = getCurrentView();
+
+    links.forEach(function (link) {
+        const navType = link.getAttribute('data-nav');
+
+        if (currentView === 'home' && navType === 'home') {
+            link.classList.add('active');
+        } else if (currentView === 'stats' && navType === 'stats') {
+            link.classList.add('active');
+        } else if (currentView === 'torres' && navType === 'torres') {
+            link.classList.add('active');
+        } else if (currentView === 'map' && navType === 'map') {
+            link.classList.add('active');
+        } else {
+            link.classList.remove('active');
+        }
+    });
+}
+
+/**
+ * Obtener la vista actual activa
+ */
+function getCurrentView() {
+    const home = document.getElementById('home');
+    const stats = document.getElementById('stats');
+    const torres = document.getElementById('torres-paine');
+    const detail = document.getElementById('detail');
+
+    if (home && home.style.display !== 'none') return 'home';
+    if (stats && stats.style.display === 'block') return 'stats';
+    if (torres && torres.style.display === 'block') return 'torres';
+    if (detail && detail.style.display === 'block') return 'detail';
+    return 'home';
 }
 
 /**
@@ -258,8 +326,8 @@ function goHome() {
     document.getElementById('stats').style.display = 'none';
     document.getElementById('torres-paine').style.display = 'none';
 
-    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-    document.querySelector('a[onclick="goHome()"]').classList.add('active');
+    // Actualizar clases activas usando el patrón del Módulo 2
+    updateActiveNavLinks();
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -273,8 +341,8 @@ function showStats() {
     document.getElementById('stats').style.display = 'block';
     document.getElementById('torres-paine').style.display = 'none';
 
-    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-    document.querySelector('a[onclick="showStats()"]').classList.add('active');
+    // Actualizar clases activas usando el patrón del Módulo 2
+    updateActiveNavLinks();
 
     renderAlerts();
     renderCityTabs();
@@ -299,7 +367,7 @@ function renderCityTabs() {
 
         html += `
             <li class="nav-item">
-                <a class="nav-link ${isActive}" href="#" onclick="selectCityStats('${city}', this); return false;">
+                <a class="nav-link ${isActive}" href="#" data-city="${city}">
                     ${shortName}
                 </a>
             </li>
@@ -308,10 +376,28 @@ function renderCityTabs() {
 
     tabsContainer.innerHTML = html;
 
+    // Setup event listeners for city tabs
+    setupCityTabsListeners();
+
     // Select first city by default
     if (cities.length > 0) {
         selectCityStats(cities[0]);
     }
+}
+
+/**
+ * Setup event listeners for city tabs
+ * Cumple con Módulo 2: uso de addEventListener
+ */
+function setupCityTabsListeners() {
+    const cityTabs = document.querySelectorAll('#cityTabs a[data-city]');
+    cityTabs.forEach(tab => {
+        tab.addEventListener('click', function(e) {
+            e.preventDefault();
+            const city = this.getAttribute('data-city');
+            selectCityStats(city, this);
+        });
+    });
 }
 
 /**
@@ -485,7 +571,7 @@ function renderAlerts() {
 }
 
 /**
- * Show detail view for a city
+ * Show detail view for a city (API data)
  */
 function showDetail(city) {
     const data = weatherService.getWeatherData(city);
@@ -577,6 +663,154 @@ function showDetail(city) {
 }
 
 /**
+ * Show detail view for a lugar (static data - Módulo 4)
+ */
+function showLugarDetail(lugarId) {
+    const lugar = buscarLugar(lugarId);
+    if (!lugar) return;
+
+    const estadisticas = calcularEstadisticas(lugar);
+    if (!estadisticas) return;
+
+    // Obtener icono según estado actual
+    const estado = lugar.estadoActual.toLowerCase();
+    let iconClass = 'fa-cloud';
+    if (estado.includes('soleado')) iconClass = 'fa-sun';
+    else if (estado.includes('lluvioso')) iconClass = 'fa-cloud-rain';
+
+    let html = `
+        <div class="detail-header">
+            <h2><i class="fas fa-mountain"></i> ${lugar.nombre}</h2>
+            <p class="text-center text-muted">Circuito ${lugar.circuito} - Torres del Paine</p>
+            <div class="weather-details">
+                <div class="detail-item">
+                    <div class="detail-item__label">Temperatura Actual</div>
+                    <div class="detail-item__value">${lugar.tempActual}°C</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-item__label">Estado</div>
+                    <div class="detail-item__value">${lugar.estadoActual}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-item__label">Circuito</div>
+                    <div class="detail-item__value">${lugar.circuito}</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="forecast-section">
+            <h3 class="forecast-title">
+                <i class="fas fa-calendar-week"></i> Pronóstico Semanal
+            </h3>
+            <div class="row g-3">
+    `;
+
+    // Mostrar pronóstico semanal
+    lugar.pronosticoSemanal.forEach((dia, index) => {
+        let diaIconClass = 'fa-cloud';
+        if (dia.estado.toLowerCase().includes('soleado')) diaIconClass = 'fa-sun';
+        else if (dia.estado.toLowerCase().includes('lluvioso')) diaIconClass = 'fa-cloud-rain';
+
+        html += `
+            <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+                <div class="forecast-card">
+                    <div class="forecast-card__day">${dia.dia}</div>
+                    <div style="font-size: 1.5rem; color: var(--secondary); margin: 0.5rem 0;">
+                        <i class="fas ${diaIconClass}"></i>
+                    </div>
+                    <div class="forecast-card__temps">
+                        <strong>${dia.max}°C</strong> / ${dia.min}°C
+                    </div>
+                    <div class="forecast-card__info">
+                        <div style="text-align: center; width: 100%;">
+                            <small>Estado</small>
+                            <div class="forecast-card__info-value">${dia.estado}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+
+    html += `
+            </div>
+        </div>
+
+        <div class="forecast-section" style="margin-top: 2rem;">
+            <h3 class="forecast-title">
+                <i class="fas fa-chart-bar"></i> Estadísticas de la Semana
+            </h3>
+            <div class="row g-3">
+                <div class="col-12 col-md-4">
+                    <div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 12px; padding: 1.5rem; text-align: center;">
+                        <h4 style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 0.5rem;">Temperatura Mínima</h4>
+                        <div style="font-size: 2.5rem; font-weight: bold;">${estadisticas.tempMinima}°C</div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4">
+                    <div class="card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; border-radius: 12px; padding: 1.5rem; text-align: center;">
+                        <h4 style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 0.5rem;">Temperatura Máxima</h4>
+                        <div style="font-size: 2.5rem; font-weight: bold;">${estadisticas.tempMaxima}°C</div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4">
+                    <div class="card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; border-radius: 12px; padding: 1.5rem; text-align: center;">
+                        <h4 style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 0.5rem;">Temperatura Promedio</h4>
+                        <div style="font-size: 2.5rem; font-weight: bold;">${estadisticas.tempPromedio}°C</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-3 mt-3">
+                <div class="col-12">
+                    <div class="card" style="background: #f8f9fa; border-radius: 12px; padding: 1.5rem;">
+                        <h4 style="margin-bottom: 1rem; color: #333;">
+                            <i class="fas fa-calendar-check"></i> Días por Tipo de Clima
+                        </h4>
+                        <div class="row">
+    `;
+
+    // Mostrar contador de días por estado
+    Object.keys(estadisticas.diasPorEstado).forEach(estado => {
+        const cantidad = estadisticas.diasPorEstado[estado];
+        html += `
+            <div class="col-6 col-md-3 mb-2">
+                <div style="background: white; padding: 1rem; border-radius: 8px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <div style="font-size: 1.5rem; font-weight: bold; color: #667eea;">${cantidad}</div>
+                    <div style="font-size: 0.85rem; color: #666; margin-top: 0.25rem;">${estado}</div>
+                </div>
+            </div>
+        `;
+    });
+
+    html += `
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-12">
+                    <div class="alert alert-info" style="border-radius: 12px; padding: 1.5rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">
+                        <h4 style="margin-bottom: 0.5rem;">
+                            <i class="fas fa-info-circle"></i> Resumen Semanal
+                        </h4>
+                        <p style="font-size: 1.1rem; margin: 0;">${estadisticas.resumen}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.getElementById('detailContent').innerHTML = html;
+    document.getElementById('home').style.display = 'none';
+    document.getElementById('stats').style.display = 'none';
+    document.getElementById('detail').style.display = 'block';
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/**
  * Show detailed information for a specific day
  */
 function showDayDetail(city, dayIndex) {
@@ -639,8 +873,8 @@ async function showTorresDetail() {
     document.getElementById('stats').style.display = 'none';
     document.getElementById('torres-paine').style.display = 'block';
 
-    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-    document.querySelector('a[onclick="showTorresDetail()"]').classList.add('active');
+    // Actualizar clases activas usando el patrón del Módulo 2
+    updateActiveNavLinks();
 
     // Initialize map if not already done
     if (!torresMapInitialized) {
@@ -671,16 +905,16 @@ function initializeTorresMap() {
 
 /**
  * Render weather points for Torres del Paine
+ * Muestra los lugares estáticos de circuitos W y O con estadísticas
  */
 async function renderTorresWeatherPoints() {
     const container = document.getElementById('torresWeatherPoints');
     container.innerHTML = '<div class="col-12 text-center"><i class="fas fa-spinner fa-spin fa-2x"></i><p>Cargando datos meteorológicos...</p></div>';
 
     try {
-        torresWeatherData = await weatherService.fetchAllTorresPoints();
-
-        if (torresWeatherData.length === 0) {
-            container.innerHTML = '<div class="col-12"><div class="alert alert-warning">No se pudieron cargar los datos meteorológicos.</div></div>';
+        // Usar datos estáticos de lugares de Torres del Paine
+        if (!lugares || lugares.length === 0) {
+            container.innerHTML = '<div class="col-12"><div class="alert alert-warning">No se encontraron lugares de Torres del Paine.</div></div>';
             return;
         }
 
@@ -696,13 +930,16 @@ async function renderTorresWeatherPoints() {
             });
         }
 
-        // Render each point
-        torresWeatherData.forEach(pointData => {
-            renderTorresWeatherCard(pointData, container);
-            addTorresMapMarker(pointData);
+        // Render cada lugar de Torres del Paine con sus estadísticas
+        lugares.forEach(lugar => {
+            renderTorresLugarCard(lugar, container);
+            addTorresLugarMarker(lugar);
         });
 
-        // Render freezing level chart
+        // Configurar navegación para cards de Torres del Paine (patrón Módulo 2)
+        setupTorresCardNavigation();
+
+        // Render freezing level chart con datos estáticos
         renderFreezingLevelChart();
 
     } catch (error) {
@@ -712,7 +949,136 @@ async function renderTorresWeatherPoints() {
 }
 
 /**
- * Render a weather card for a Torres point
+ * Render a weather card for a Torres lugar (datos estáticos con estadísticas)
+ * Usa el mismo estilo que las cards de ciudades (place-card)
+ */
+function renderTorresLugarCard(lugar, container) {
+    const estadisticas = calcularEstadisticas(lugar);
+    if (!estadisticas) return;
+
+    const estado = lugar.estadoActual.toLowerCase();
+    let modifier = 'cloudy';
+    let iconClass = 'fa-cloud';
+    
+    if (estado.includes('soleado')) {
+        modifier = 'sunny';
+        iconClass = 'fa-sun';
+    } else if (estado.includes('lluvioso')) {
+        modifier = 'rainy';
+        iconClass = 'fa-cloud-rain';
+    } else if (estado.includes('nublado')) {
+        modifier = 'cloudy';
+        iconClass = 'fa-cloud';
+    }
+
+    // Calcular variables meteorológicas para excursionistas
+    const viento = lugar.viento || 20;
+    const direccionViento = lugar.direccionViento || 180;
+    const humedad = lugar.humedad || 70;
+    const altitud = lugar.altitud || 500;
+
+    // Calcular sensación térmica
+    const sensacionTermica = typeof calcularSensacionTermica === 'function' 
+        ? calcularSensacionTermica(lugar.tempActual, viento) 
+        : lugar.tempActual;
+
+    // Calcular índice UV
+    const indiceUV = typeof calcularIndiceUV === 'function' 
+        ? calcularIndiceUV(lugar.estadoActual, lugar.tempActual) 
+        : 3;
+    const infoUV = typeof obtenerDescripcionUV === 'function' 
+        ? obtenerDescripcionUV(indiceUV) 
+        : { nivel: 'Moderado', color: '#ffc107' };
+
+    // Evaluar viento
+    const infoViento = typeof evaluarViento === 'function' 
+        ? evaluarViento(viento) 
+        : { nivel: 'Moderado', icon: 'fa-wind', color: '#ffc107' };
+
+    // Evaluar visibilidad
+    const infoVisibilidad = typeof evaluarVisibilidad === 'function' 
+        ? evaluarVisibilidad(lugar.estadoActual, humedad) 
+        : { valor: 'Moderada', icon: 'fa-eye', color: '#ff9800', km: '5-15 km' };
+
+    // Probabilidad de precipitación
+    const probPrecipitacion = typeof calcularProbabilidadPrecipitacion === 'function' 
+        ? calcularProbabilidadPrecipitacion(lugar.estadoActual) 
+        : 30;
+
+    // Dirección del viento
+    const dirViento = typeof obtenerDireccionViento === 'function' 
+        ? obtenerDireccionViento(direccionViento) 
+        : 'S';
+
+    const cardHtml = `
+        <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+            <article class="place-card place-card--${modifier} torres-lugar-card" data-lugar-id="${lugar.id}">
+                <div class="place-card__header">
+                    <h2 class="place-card__name">${lugar.nombre}</h2>
+                    <span class="place-card__distance">Circuito ${lugar.circuito}</span>
+                </div>
+                <div class="place-card__body">
+                    <div class="place-card__icon">
+                        <i class="fas ${iconClass}"></i>
+                    </div>
+                    <div class="place-card__temp">${lugar.tempActual}°C</div>
+                    <div class="place-card__description">${lugar.estadoActual}</div>
+                    
+                    <!-- Variables para excursionistas -->
+                    <div class="place-card__excursionista">
+                        <div class="place-card__excursionista-row">
+                            <div class="place-card__excursionista-item">
+                                <i class="fas fa-thermometer-half" style="color: #ff6b6b;"></i>
+                                <span class="place-card__excursionista-label">Sensación:</span>
+                                <span class="place-card__excursionista-value">${sensacionTermica}°C</span>
+                            </div>
+                            <div class="place-card__excursionista-item">
+                                <i class="fas ${infoViento.icon}" style="color: ${infoViento.color};"></i>
+                                <span class="place-card__excursionista-label">Viento:</span>
+                                <span class="place-card__excursionista-value">${viento} km/h ${dirViento}</span>
+                            </div>
+                        </div>
+                        <div class="place-card__excursionista-row">
+                            <div class="place-card__excursionista-item">
+                                <i class="fas ${infoVisibilidad.icon}" style="color: ${infoVisibilidad.color};"></i>
+                                <span class="place-card__excursionista-label">Visibilidad:</span>
+                                <span class="place-card__excursionista-value">${infoVisibilidad.km}</span>
+                            </div>
+                            <div class="place-card__excursionista-item">
+                                <i class="fas fa-sun" style="color: ${infoUV.color};"></i>
+                                <span class="place-card__excursionista-label">UV:</span>
+                                <span class="place-card__excursionista-value">${indiceUV} (${infoUV.nivel})</span>
+                            </div>
+                        </div>
+                        <div class="place-card__excursionista-row">
+                            <div class="place-card__excursionista-item">
+                                <i class="fas fa-tint" style="color: #4fc3f7;"></i>
+                                <span class="place-card__excursionista-label">Humedad:</span>
+                                <span class="place-card__excursionista-value">${humedad}%</span>
+                            </div>
+                            <div class="place-card__excursionista-item">
+                                <i class="fas fa-cloud-rain" style="color: #64b5f6;"></i>
+                                <span class="place-card__excursionista-label">Prob. Lluvia:</span>
+                                <span class="place-card__excursionista-value">${probPrecipitacion}%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="place-card__stats">
+                        <div class="place-card__stats-row">Mín: ${estadisticas.tempMinima}°C | Máx: ${estadisticas.tempMaxima}°C</div>
+                        <div class="place-card__stats-row">Promedio: ${estadisticas.tempPromedio}°C</div>
+                    </div>
+                    <span class="place-card__badge">Ver detalle →</span>
+                </div>
+            </article>
+        </div>
+    `;
+
+    container.insertAdjacentHTML('beforeend', cardHtml);
+}
+
+/**
+ * Render a weather card for a Torres point (API data - mantiene compatibilidad)
  */
 function renderTorresWeatherCard(pointData, container) {
     const current = pointData.current;
@@ -770,7 +1136,50 @@ function renderTorresWeatherCard(pointData, container) {
 }
 
 /**
- * Add marker to Torres map
+ * Add marker to Torres map for lugar estático
+ */
+function addTorresLugarMarker(lugar) {
+    if (!torresMap) return;
+
+    // Coordenadas aproximadas para cada lugar (puedes ajustarlas)
+    const coordenadas = {
+        1: [-50.9417, -72.9667], // Base Torres
+        2: [-51.0, -73.23],      // Glaciar Grey
+        3: [-50.9667, -73.0833], // Valle del Francés
+        4: [-50.9500, -73.1167], // Refugio Paine Grande
+        5: [-50.9583, -73.0667]   // Campamento Italiano
+    };
+
+    const coords = coordenadas[lugar.id] || [-50.95, -73.05];
+    const temp = lugar.tempActual;
+
+    // Color based on temperature
+    let color;
+    if (temp < 0) color = '#0d47a1';
+    else if (temp < 5) color = '#1976d2';
+    else if (temp < 10) color = '#00bcd4';
+    else if (temp < 15) color = '#4caf50';
+    else color = '#ff9800';
+
+    const marker = L.circleMarker(coords, {
+        radius: 8,
+        fillColor: color,
+        color: '#fff',
+        weight: 2,
+        fillOpacity: 0.9
+    }).addTo(torresMap);
+
+    marker.bindPopup(`
+        <div style="text-align: center;">
+            <strong><i class="fas fa-mountain"></i> ${lugar.nombre}</strong><br>
+            <span style="font-size: 1.2rem; font-weight: bold;">${temp}°C</span><br>
+            <small>Circuito ${lugar.circuito}</small>
+        </div>
+    `);
+}
+
+/**
+ * Add marker to Torres map (API data - mantiene compatibilidad)
  */
 function addTorresMapMarker(pointData) {
     if (!torresMap) return;
@@ -805,18 +1214,52 @@ function addTorresMapMarker(pointData) {
 }
 
 /**
+ * Configurar navegación desde cards de Torres del Paine usando addEventListener
+ * Cumple con requisito del Módulo 2: Ejemplo de uso de JS 1
+ */
+function setupTorresCardNavigation() {
+    const torresCards = document.querySelectorAll('.torres-lugar-card');
+    
+    torresCards.forEach(function (card) {
+        card.addEventListener('click', function () {
+            const lugarId = parseInt(this.getAttribute('data-lugar-id'));
+            if (lugarId) {
+                showLugarDetail(lugarId);
+            }
+        });
+    });
+}
+
+/**
  * Render Freezing Level Chart with mountain silhouette
+ * Usa datos estáticos de lugares
  */
 function renderFreezingLevelChart() {
     const ctx = document.getElementById('freezingLevelChart');
-    if (!ctx) return;
+    if (!ctx) {
+        console.warn('Canvas freezingLevelChart no encontrado');
+        return;
+    }
 
-    // Get average temperature from all Torres points
-    const avgTemp = torresWeatherData.reduce((sum, p) => sum + p.current.temperature_2m, 0) / torresWeatherData.length;
+    // Destruir gráfico anterior si existe
+    if (window.freezingLevelChartInstance) {
+        window.freezingLevelChartInstance.destroy();
+    }
+
+    // Calcular temperatura promedio de los lugares estáticos
+    let avgTemp = 0;
+    if (lugares && lugares.length > 0) {
+        const sumaTemps = lugares.reduce((sum, lugar) => sum + lugar.tempActual, 0);
+        avgTemp = sumaTemps / lugares.length;
+    } else {
+        // Fallback si no hay lugares
+        avgTemp = 8;
+    }
 
     // Calculate freezing level (assuming base altitude of 100m for Torres del Paine)
     const baseAltitude = 100;
-    const freezingLevel = weatherService.calculateFreezingLevel(avgTemp, baseAltitude);
+    const freezingLevel = weatherService ? weatherService.calculateFreezingLevel(avgTemp, baseAltitude) : 
+        Math.round(baseAltitude + (avgTemp / 6.5) * 1000); // Fórmula manual si no hay weatherService
 
     // Mountain peaks in Torres del Paine (approximate heights in meters)
     const mountains = [
@@ -846,7 +1289,8 @@ function renderFreezingLevelChart() {
         mountainData.push(Math.max(baseAltitude, height));
     }
 
-    new Chart(ctx, {
+    // Guardar instancia del gráfico para poder destruirlo después
+    window.freezingLevelChartInstance = new Chart(ctx, {
         type: 'line',
         data: {
             labels: labels,
@@ -865,11 +1309,16 @@ function renderFreezingLevelChart() {
                     label: `Isoterma 0°C (${freezingLevel}m)`,
                     data: Array(labels.length).fill(freezingLevel),
                     borderColor: '#dc3545',
-                    backgroundColor: 'rgba(220, 53, 69, 0.1)',
-                    borderWidth: 3,
+                    backgroundColor: 'rgba(220, 53, 69, 0.2)',
+                    borderWidth: 4,
                     borderDash: [10, 5],
-                    fill: false,
-                    pointRadius: 0
+                    fill: {
+                        target: 'origin',
+                        above: 'rgba(220, 53, 69, 0.1)'
+                    },
+                    pointRadius: 0,
+                    order: 0, // Asegurar que la línea roja esté visible
+                    tension: 0
                 }
             ]
         },
@@ -911,14 +1360,19 @@ function renderFreezingLevelChart() {
                             return value + 'm';
                         },
                         font: { size: 11 },
-                        color: '#333'
+                        color: '#333',
+                        stepSize: 500
                     },
                     grid: {
-                        color: 'rgba(0, 0, 0, 0.05)'
+                        color: 'rgba(0, 0, 0, 0.1)',
+                        drawOnChartArea: true
                     }
                 },
                 x: {
-                    display: false
+                    display: false,
+                    grid: {
+                        display: false
+                    }
                 }
             }
         }
